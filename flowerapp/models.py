@@ -55,7 +55,7 @@ class BouquetItem(models.Model):
 class BouquetItemsInBouquet(models.Model):
     bouquet = models.ForeignKey(Bouquet, related_name='items', on_delete=models.CASCADE)
     item = models.ForeignKey(BouquetItem, related_name='bouquet_relations', on_delete=models.CASCADE)
-    count = models.PositiveSmallIntegerField('количество', validators=[MinValueValidator(0)])
+    count = models.PositiveSmallIntegerField('количество', validators=[MinValueValidator(1)], default=1)
 
     class Meta:
         verbose_name = 'элемент букета в букете'
@@ -67,6 +67,7 @@ class BouquetItemsInBouquet(models.Model):
 
 class FlowerShop(models.Model):
     address = models.CharField('адрес', max_length=200)
+    phone = PhoneNumberField('контактный номер', region='RU', blank=True)  # TODO: migration for remove blank
 
     class Meta:
         verbose_name = 'магазин цветов'
