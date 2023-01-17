@@ -137,3 +137,28 @@ class Order(models.Model):
 
     def __str__(self):
         return f'Заказ {self.pk} ({self.created_at}), {self.bouquet} по адресу {self.delivery_address}'
+
+
+class Consultation(models.Model):
+    class Status(models.TextChoices):
+        created = 'создана'
+        consulted = 'оказана'
+        cancelled = 'отменена (не доступен)'
+
+    client_name = models.CharField('имя клиента', max_length=200)
+    phone = PhoneNumberField('контактный номер', region='RU')
+    created_at = models.DateTimeField('дата и время заказа консультации', default=timezone.now)
+    consulted_at = models.DateTimeField('дата и время оказания консультации', null=True, blank=True)
+    status = models.CharField(
+        'статус консультации',
+        max_length=30,
+        choices=Status.choices,
+        default=Status.created
+    )
+
+    class Meta:
+        verbose_name = 'консультация'
+        verbose_name_plural = 'консультации'
+
+    def __str__(self):
+        return f'Консультация {self.pk} ({self.created_at}), {self.phone} ({self.client_name})'

@@ -91,3 +91,11 @@ class OrderAdmin(admin.ModelAdmin):
                           'paid', 'status', 'created_at', 'composed_at', 'delivered_at']
     search_fields = ['client_name', 'phone', 'delivery_address']
     list_filter = ['bouquet', 'paid', 'status']
+
+
+@admin.register(m.Consultation)
+class ConsultationAdmin(admin.ModelAdmin):
+    list_display = ['client_name', 'phone', 'created_at', 'status', 'consulted_at']
+    list_display_links = ['client_name', 'phone', 'created_at', 'status', 'consulted_at']
+    search_fields = ['client_name', 'phone']
+    list_filter = ['status']
