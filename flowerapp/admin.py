@@ -69,7 +69,7 @@ class BouquetAdmin(admin.ModelAdmin):
     def get_image_preview(self, obj):
         if not obj.photo:
             return 'выберите картинку'
-        return format_html('<img src="{url}" style="max-height: 200px;"/>', url=obj.image.url)
+        return format_html('<img src="{url}" style="max-height: 200px;"/>', url=obj.photo.url)
 
     get_image_preview.short_description = 'превью'
 

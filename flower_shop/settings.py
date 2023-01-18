@@ -14,7 +14,6 @@ from pathlib import Path
 
 from environs import Env
 
-
 env = Env()
 env.read_env()
 
@@ -43,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'rest_framework',
     'userapp',
     'flowerapp',
 ]

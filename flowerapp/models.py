@@ -31,6 +31,7 @@ class Bouquet(models.Model):
         help_text='задается в сантиметрах'
     )
     events = models.ManyToManyField(Event)
+    is_recommended = models.BooleanField('рекомендованный', default=False)
 
     class Meta:
         verbose_name = 'букет'
