@@ -3,6 +3,10 @@
 {% load format_thousands %}
 {% block div-start %}<div class="mainBg">{% endblock div-start %}
   {% block banner %}
+		<div class="success-alert" style="display: {{ success_alert_style }}">
+			<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+			<strong>Успешно!</strong> Менеджер перезвонит вам в течение часа для консультации
+		</div>
     <section id="banner">
 	    <div class="container">
 		    <div class="banner">
