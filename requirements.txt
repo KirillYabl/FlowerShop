@@ -1,7 +1,7 @@
 django==3.2.16
 djangorestframework==3.14.0
-django-debug-toolbar==3.2.1
-django-phonenumber-field==7.0.2
-environs==9.5.0
-phonenumbers==8.13.4
-Pillow==9.4.0
+django-debug-toolbar
+django-phonenumber-field
+environs
+phonenumbers
+Pillow
