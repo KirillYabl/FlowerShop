@@ -83,5 +83,39 @@ def quiz(request: WSGIRequest) -> HttpResponse:
 
 
 def result(request: WSGIRequest) -> HttpResponse:
-    context = {}
+    event = request.GET.get('event', None)
+    price_from = request.GET.get('price_from', None)
+    price_to = request.GET.get('price_to', None)
+    params = {}
+    if event:
+        try:
+            Event.objects.get(id=event)
+            params['events__id__in'] = event
+        except Event.DoesNotExist:
+            pass
+    if price_from:
+        try:
+            float(price_from)
+            params['price__gte'] = price_from
+        except ValueError:
+            pass
+    if price_to:
+        try:
+            float(price_to)
+            params['price__lte'] = price_to
+        except ValueError:
+            pass
+
+    if params:
+        suitable_bouquets = Bouquet.objects.filter(**params)
+        if suitable_bouquets:
+            selected_bouquet = suitable_bouquets.order_by('-price').prefetch_related('items', 'items__item')[0]
+        else:
+            # else for avoid extra queries
+            selected_bouquet = Bouquet.objects.order_by('-price').prefetch_related('items', 'items__item')[0]
+    else:
+        # else for avoid extra queries
+        selected_bouquet = Bouquet.objects.order_by('-price').prefetch_related('items', 'items__item')[0]
+
+    context = {'bouquet': selected_bouquet}
     return render(request, 'result.html', context)
