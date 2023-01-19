@@ -1,30 +1,35 @@
 from django.core.handlers.wsgi import WSGIRequest
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
+from django.utils import timezone
 from rest_framework.viewsets import ModelViewSet
 
 from .forms import ConsultationForm
 from .models import Bouquet
-from .models import Consultation
 from .models import FlowerShop
 from .models import BouquetItemsInBouquet
-from .serializers import ConsultationSerializer
 
 
 def index(request: WSGIRequest) -> HttpResponse:
+    success_alert_style = request.COOKIES.get('success_alert_style', 'none')
+
     bouquets = Bouquet.objects.filter(is_recommended=True)
     flower_shops = FlowerShop.objects.all()
     context = {
         'bouquets': bouquets,
         'flower_shops': flower_shops,
-        'success_alert_style': 'none',
+        'success_alert_style': success_alert_style,
         'form': ConsultationForm()
     }
     if request.method == 'POST':
         context['form'] = ConsultationForm(request.POST)
         if context['form'].is_valid():
             context['form'].save()
-            context['success_alert_style'] = 'block'
+            response = redirect('index')
+            expires_seconds = 3
+            expires = timezone.now() + timezone.timedelta(seconds=expires_seconds)
+            response.set_cookie('success_alert_style', 'block', expires=expires)
+            return response
 
     return render(request, 'index.html', context)
 
