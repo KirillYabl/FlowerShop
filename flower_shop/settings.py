@@ -10,10 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
-from pathlib import Path
 
 from environs import Env
-
 
 env = Env()
 env.read_env()
@@ -42,10 +40,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debug_toolbar',
+    'rest_framework',
     'userapp',
     'flowerapp',
 ]
+
+if DEBUG:
+    # for pythonanywhere
+    INSTALLED_APPS += ['debug_toolbar',]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
