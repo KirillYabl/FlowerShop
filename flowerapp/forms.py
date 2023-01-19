@@ -31,3 +31,35 @@ class ConsultationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'consultation__form_input'
+
+
+class CustomEventForm(forms.Form):
+    event = forms.CharField(
+        max_length=100,
+        label='',
+        widget=forms.TextInput(attrs={'placeholder': 'Введите свой повод'}),
+        error_messages={
+            'required': 'Поле "Повод" не должно быть пустым'
+        }
+    )
+    client_name = forms.CharField(
+        max_length=200,
+        label='',
+        widget=forms.TextInput(attrs={'placeholder': 'Введите Имя'}),
+        error_messages={
+            'required': 'Поле "Имя" не должно быть пустым'
+        }
+    )
+    phone = PhoneNumberField(
+        region='RU',
+        label='',
+        widget=RegionalPhoneNumberWidget(attrs={'placeholder': '+ 7(999) 000-00-00'}),
+        error_messages={
+            'invalid': 'Поле "Телефон" должно быть в формате + 7(999) 000-00-00'
+        }
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'quiz__form_input'

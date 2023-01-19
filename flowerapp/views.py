@@ -7,7 +7,9 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .forms import ConsultationForm
+from .forms import CustomEventForm
 from .models import Bouquet
+from .models import Consultation
 from .models import Event
 from .models import FlowerShop
 from .models import BouquetItemsInBouquet
@@ -72,13 +74,41 @@ def quiz(request: WSGIRequest) -> HttpResponse:
     event = request.GET.get('event', None)
     price_from = request.GET.get('price_from', None)
     price_to = request.GET.get('price_to', None)
+    custom = request.GET.get('custom', 'false').lower() == 'true'
     step = 1
     if event:
         step = 2
-    context = {'events': Event.objects.all(), 'step': step, 'event': event}
+    context = {'events': Event.objects.all(), 'step': step, 'event': event, 'custom': custom}
+    if step == 1:
+        context['form'] = CustomEventForm()
+    elif step == 2 and custom:
+        context['form'] = CustomEventForm(request.GET)
+        context['anchor'] = '#consultation'
+        if context['form'].is_valid():
+            for name, value in context['form'].cleaned_data.items():
+                context[name] = str(value)
+        else:
+            context['step'] = 1
+            return render(request, 'quiz.html', context)
+
     if event and price_from and price_to:
-        query_string = urlencode({'event': event, 'price_from': price_from, 'price_to': price_to})
-        return redirect(reverse('result') + '?' + query_string)
+        if not custom:
+            query_string = urlencode({'event': event, 'price_from': price_from, 'price_to': price_to})
+            return redirect(reverse('result') + '?' + query_string)
+        budget = f'От {price_from} до {price_to}'
+        consultation_obj = Consultation(
+            client_name=context['client_name'],
+            phone=context['phone'],
+            event=context['event'],
+            budget=budget,
+        )
+        consultation_obj.save()
+        response = redirect('index')
+        expires_seconds = 3
+        expires = timezone.now() + timezone.timedelta(seconds=expires_seconds)
+        response.set_cookie('success_alert_style', 'block', expires=expires)
+        return response
+
     return render(request, 'quiz.html', context)
 
 

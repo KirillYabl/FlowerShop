@@ -161,6 +161,8 @@ class Consultation(models.Model):
         choices=Status.choices,
         default=Status.created
     )
+    event = models.CharField('повод', max_length=100, blank=True)
+    budget = models.CharField('бюджет', max_length=100, blank=True)
 
     class Meta:
         verbose_name = 'консультация'
