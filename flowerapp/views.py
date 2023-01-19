@@ -1,11 +1,14 @@
+from urllib.parse import urlencode
+
 from django.core.handlers.wsgi import WSGIRequest
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.utils import timezone
-from rest_framework.viewsets import ModelViewSet
 
 from .forms import ConsultationForm
 from .models import Bouquet
+from .models import Event
 from .models import FlowerShop
 from .models import BouquetItemsInBouquet
 
@@ -66,13 +69,17 @@ def order_step(request: WSGIRequest) -> HttpResponse:
 
 
 def quiz(request: WSGIRequest) -> HttpResponse:
-    context = {}
+    event = request.GET.get('event', None)
+    price_from = request.GET.get('price_from', None)
+    price_to = request.GET.get('price_to', None)
+    step = 1
+    if event:
+        step = 2
+    context = {'events': Event.objects.all(), 'step': step, 'event': event}
+    if event and price_from and price_to:
+        query_string = urlencode({'event': event, 'price_from': price_from, 'price_to': price_to})
+        return redirect(reverse('result') + '?' + query_string)
     return render(request, 'quiz.html', context)
-
-
-def quiz_step(request: WSGIRequest) -> HttpResponse:
-    context = {}
-    return render(request, 'quiz-step.html', context)
 
 
 def result(request: WSGIRequest) -> HttpResponse:

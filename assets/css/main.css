@@ -484,6 +484,14 @@ margin-bottom: 30px;
 	height: 8px;
 }
 
+.quiz__progress_lineActive2 {;
+	position: absolute;
+	background: #17CF97;
+	border-radius: 10px;
+	width: 50%;
+	height: 8px;
+}
+
 /*result.html*/
 .result__elems {
 	width: 384px;
