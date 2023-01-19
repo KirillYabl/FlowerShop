@@ -1,50 +1,24 @@
 {% extends "base.html" %}
 {% load static %}
+{% load format_thousands %}
 {% block first-section %}
 	<section id="catalog">
 		<div class="container p100">
 			<div class="catalog">
 				<div class="title">Все букеты</div>
-				<div class="catalog__block">
-					<div class="recommended__elems ficb recommended__elems_first">
-						<div class="recommended__block recommended__block_first">
-							<div class="recommended__block_elems ficb">
-								<span class="recommended__block_intro">Летнее утро</span>
-								<span class="recommended__block_price">3 600 руб</span>
+				<div class="catalog__block" style="display: flex; justify-content: space-between; flex-wrap: wrap;">					
+					{% for bouquet in bouquets %}
+					<a href="{% url 'card' bouquet.id %}" style="text-decoration: none; color: #ABABAB;">
+						<div class="recommended__elems ficb" style="background: url({{ bouquet.photo.url }}) no-repeat center bottom / cover;">
+							<div class="recommended__block ">
+								<div class="recommended__block_elems ficb">
+									<span class="recommended__block_intro">{{ bouquet.name }}</span>
+									<span class="recommended__block_price">{{ bouquet.price|floatformat:'0'|format_thousands }} руб</span>
+								</div>
 							</div>
 						</div>
-						<div class="recommended__block recommended__block_sec">
-							<div class="recommended__block_elems ficb">
-								<span class="recommended__block_intro">Пламенный закат</span>
-								<span class="recommended__block_price">3 600 руб</span>
-							</div>
-						</div>
-						<div class="recommended__block recommended__block_thr">
-							<div class="recommended__block_elems ficb">
-								<span class="recommended__block_intro">Осенний</span>
-								<span class="recommended__block_price">3 600 руб</span>
-							</div>
-						</div>
-					</div>
-					<div class="recommended__elems ficb recommended__elems_sec">
-						<div class="recommended__block recommended__block_first">
-							<div class="recommended__block_elems ficb">
-								<span class="recommended__block_intro">Полевой</span>
-								<span class="recommended__block_price">1 600 руб</span>
-							</div>
-						</div>
-						<div class="recommended__block recommended__block_sec">
-							<div class="recommended__block_elems ficb">
-								<span class="recommended__block_intro">Весенний</span>
-								<span class="recommended__block_price">3 200 руб</span>
-							</div>
-						</div>
-						<div class="recommended__block recommended__block_thr">
-							<div class="recommended__block_elems ficb">
-								<span class="recommended__block_intro">Нежный</span>
-								<span class="recommended__block_price">2 900 руб</span>
-							</div>
-						</div>
+					</a>
+					{% endfor %}
 					</div>
 					<button class="btn largeBtn catalog__btn">Показать ещё</button>
 				</div>

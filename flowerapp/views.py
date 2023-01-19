@@ -7,6 +7,7 @@ from .forms import ConsultationForm
 from .models import Bouquet
 from .models import Consultation
 from .models import FlowerShop
+from .models import BouquetItemsInBouquet
 from .serializers import ConsultationSerializer
 
 
@@ -27,14 +28,19 @@ def index(request: WSGIRequest) -> HttpResponse:
 
     return render(request, 'index.html', context)
 
-
-def card(request: WSGIRequest) -> HttpResponse:
-    context = {}
+def card(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
+    selected_bouquet = Bouquet.objects.get(id=bouquet_id)
+    bouquet_items = BouquetItemsInBouquet.objects.filter(bouquet=selected_bouquet).all()
+    context = {
+        'bouquet': selected_bouquet,
+        'bouquet_items': bouquet_items,
+    }
     return render(request, 'card.html', context)
 
 
 def catalog(request: WSGIRequest) -> HttpResponse:
-    context = {}
+    bouquets =Bouquet.objects.all()
+    context = {'bouquets': bouquets}
     return render(request, 'catalog.html', context)
 
 
