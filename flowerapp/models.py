@@ -1,7 +1,10 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
+
+User = get_user_model()
 
 
 class Event(models.Model):
@@ -131,6 +134,8 @@ class Order(models.Model):
     composed_at = models.DateTimeField('дата и время сбора букета флористом', null=True, blank=True)
     delivered_at = models.DateTimeField('дата и время доставки букета', null=True, blank=True)
     status = models.CharField('статус заказа', max_length=15, choices=Status.choices, default=Status.created)
+    florist = models.ForeignKey(User, related_name='f_orders', on_delete=models.DO_NOTHING, null=True, blank=True)
+    courier = models.ForeignKey(User, related_name='c_orders', on_delete=models.DO_NOTHING, null=True, blank=True)
 
     class Meta:
         verbose_name = 'заказ'
