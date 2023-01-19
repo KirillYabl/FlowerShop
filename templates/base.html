@@ -51,7 +51,9 @@
                   src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3Aa53d66d7093e0fd3582b9e44190a77296424f88e1bb1a738e61751da30a10119&amp;width=398&amp;height=316&amp;lang=ru_RU&amp;scroll=true"></script>
         </div>
       </div>
-      <button class="btn contacts__btn">Заказать доставку</button>
+      <form action="{% url 'quiz' %}">
+        <button class="btn contacts__btn">Заказать доставку</button>
+      </form>
     </div>
   </div>
 </section>
