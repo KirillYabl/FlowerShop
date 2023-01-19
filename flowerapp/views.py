@@ -31,16 +31,35 @@ def index(request: WSGIRequest) -> HttpResponse:
 def card(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
     selected_bouquet = Bouquet.objects.get(id=bouquet_id)
     bouquet_items = BouquetItemsInBouquet.objects.filter(bouquet=selected_bouquet).all()
+    price_order = float(selected_bouquet.price)
+    link_order = f'https://arsenalpay.ru/widget.html?widget=13711&destination=12345&amount={price_order}'
     context = {
         'bouquet': selected_bouquet,
         'bouquet_items': bouquet_items,
+        'success_alert_style': 'none',
+        'form': ConsultationForm(),
+        'link_order': link_order,
     }
+    if request.method == 'POST':
+        context['form'] = ConsultationForm(request.POST)
+        if context['form'].is_valid():
+            context['form'].save()
+            context['success_alert_style'] = 'block'
     return render(request, 'card.html', context)
 
 
 def catalog(request: WSGIRequest) -> HttpResponse:
     bouquets =Bouquet.objects.all()
-    context = {'bouquets': bouquets}
+    context = {
+        'bouquets': bouquets,
+        'success_alert_style': 'none',
+        'form': ConsultationForm()
+    }
+    if request.method == 'POST':
+        context['form'] = ConsultationForm(request.POST)
+        if context['form'].is_valid():
+            context['form'].save()
+            context['success_alert_style'] = 'block'
     return render(request, 'catalog.html', context)
 
 

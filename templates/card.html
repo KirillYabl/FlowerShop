@@ -32,7 +32,12 @@
 							</span>
 						</div>
 					</div>
-					<button class="btn largeBtn card__btn">Заказать букет</button>
+					<a href="{% url 'order' %}">
+						<button class="btn largeBtn card__btn">Заказать букет</button>
+					</a>
+					<!-- <a href="{{link_order}}" class="btn largeBtn card__btn" style="display: block; text-decoration: none; text-align: center;">
+						Заказать букет
+					</a> -->
 				</div>
 			</div>
 		</div>
