@@ -4,25 +4,20 @@
 {% block div-start %}
 <div class="mainBg">{% endblock div-start %}
   {% block banner %}
-  <div class="success-alert" style="display: {{ success_alert_style }}">
-    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-    <strong>Успешно!</strong> Менеджер перезвонит вам в течение часа для консультации
-  </div>
-  <section id="banner">
-    <div class="container">
-      <div class="banner">
-        <div class="banner__block">
-          <h1 class="banner__title">Мастерская цветов</h1>
-          <p class="banner__text">Подберем для вас букет за два шага, который идеально подойдет под вашу ситуацию</p>
-          <button class="btn banner__btn">Подобрать букет</button>
+      <section id="banner">
+        <div class="container">
+          <div class="banner">
+            <div class="banner__block">
+              <h1 class="banner__title">Мастерская цветов</h1>
+              <p class="banner__text">Подберем для вас букет за два шага, который идеально подойдет под вашу ситуацию</p>
+              <button class="btn banner__btn">Подобрать букет</button>
+            </div>
+            <img src="{% static 'img/bannerImg.png' %}" alt="banner Img" class="banner__img">
+          </div>
         </div>
-        <img src="{% static 'img/bannerImg.png' %}" alt="banner Img" class="banner__img">
-      </div>
-    </div>
-  </section>
+      </section>
   {% endblock banner %}
-  {% block div-end %}
-</div>{% endblock div-end %}
+{% block div-end %}</div>{% endblock div-end %}
 
 {% block first-section %}
 <section id="recommended">
