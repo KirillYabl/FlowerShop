@@ -6,10 +6,22 @@ from .models import Consultation
 
 
 class ConsultationForm(forms.ModelForm):
-    client_name = forms.CharField(max_length=200, label='',
-                                  widget=forms.TextInput(attrs={'placeholder': 'Введите Имя'}))
-    phone = PhoneNumberField(region='RU', label='',
-                             widget=RegionalPhoneNumberWidget(attrs={'placeholder': '+ 7(999) 000 00 00'}))
+    client_name = forms.CharField(
+        max_length=200,
+        label='',
+        widget=forms.TextInput(attrs={'placeholder': 'Введите Имя'}),
+        error_messages={
+            'required': 'Поле "Имя" не должно быть пустым'
+        }
+    )
+    phone = PhoneNumberField(
+        region='RU',
+        label='',
+        widget=RegionalPhoneNumberWidget(attrs={'placeholder': '+ 7(999) 000-00-00'}),
+        error_messages={
+            'invalid': 'Поле "Телефон" должно быть в формате + 7(999) 000-00-00'
+        }
+    )
 
     class Meta:
         model = Consultation
