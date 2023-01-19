@@ -1,3 +1,5 @@
+{% load static %}
+{% load format_thousands %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,16 +7,16 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Flower Shop</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Unbounded:wght@700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="css/main.css">	
+	<link rel="stylesheet" href="{% static 'css/main.css' %}">	
 </head>
 <body>
 	<header id="header">
 		<div class="container">
 			<div class="header ficb">
-				<a href="/"><img src="img/logo.svg" alt="logo" class="logo"></a>
+				<a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
 				<nav>
 					<ul class="menu ficc">
-						<li class="menu__item"><a href="#" class="menu__item_link">Каталог</a></li>
+						<li class="menu__item"><a href="{% url 'catalog' %}" class="menu__item_link">Каталог</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
 					</ul>
@@ -26,8 +28,8 @@
 		<div class="container p100">
 			<div class="catalog">
 				<div class="title">Все букеты</div>
-				<div class="catalog__block">
-					<div class="recommended__elems ficb recommended__elems_first">
+				<div class="catalog__block" style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+					<!-- <div class="recommended__elems ficb recommended__elems_first">
 						<div class="recommended__block recommended__block_first">
 							<div class="recommended__block_elems ficb">
 								<span class="recommended__block_intro">Летнее утро</span>
@@ -46,8 +48,6 @@
 								<span class="recommended__block_price">3 600 руб</span>
 							</div>
 						</div>
-						
-
 					</div>
 					<div class="recommended__elems ficb recommended__elems_sec">
 						<div class="recommended__block recommended__block_first">
@@ -70,7 +70,21 @@
 						</div>
 						
 						
-					</div>
+					</div> -->
+					
+					{% for bouquet in bouquets %}
+					<a href="{% url 'card' %}" style="text-decoration: none; color: #ABABAB;">
+						<div class="recommended__elems ficb" style="background: url({{ bouquet.photo.url }}) no-repeat center bottom / cover;">
+							<div class="recommended__block ">
+								<div class="recommended__block_elems ficb">
+									<span class="recommended__block_intro">{{ bouquet.name }}</span>
+									<span class="recommended__block_price">{{ bouquet.price|floatformat:'0'|format_thousands }} руб</span>
+								</div>
+							</div>
+						</div>
+					</a>
+					{% endfor %}
+					
 					<button class="btn largeBtn catalog__btn">Показать ещё</button>
 				</div>
 			</div>
@@ -91,10 +105,10 @@
 	<footer id="footer">
 		<div class="container">
 			<div class="footer">
-				<a href="/"><img src="img/logo.svg" alt="logo" class="logo footer__logo"></a>
+				<a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo footer__logo"></a>
 				<nav>
 					<ul class="menu footer__menu ficc">
-						<li class="menu__item"><a href="#" class="menu__item_link">Каталог</a></li>
+						<li class="menu__item"><a href="{% url 'catalog' %}" class="menu__item_link">Каталог</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
 					</ul>
