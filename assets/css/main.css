@@ -772,3 +772,51 @@ opacity: 0.3;
 .closebtn:hover {
   color: black;
 }
+
+/* Login.html */
+#login {
+	padding-top: 37px;
+	padding-bottom: 49px;
+	background: #17CF97;
+}
+.login__title {
+	line-height: 103.52%;
+/* or 37px */
+margin-bottom: 19px;
+	text-align: center;
+color: #FFFFFF;
+}
+.login__form {
+	width: 655px;
+	margin: 0 auto;
+}
+.login__form_input {
+	padding-left: 30px;
+	padding-right: 7px;
+
+	width: 240px;
+	height: 57px;
+	border: none;
+	outline: none;
+	background: #FFFFFF;
+	border-radius: 5px;
+	font-size: 16px;
+	line-height: 103.52%;
+	color: rgba(0, 0, 0, .3);
+	margin-right: 10px;
+}
+.login__form_btn {
+	font-weight: 500;
+	font-size: 16px;
+	line-height: 103.52%;
+	/* identical to box height, or 17px */
+
+
+	color: #FFFFFF;
+	width: 141px;
+	height: 57px;
+	background: transparent;
+	border: 1px solid #FFFFFF;
+	border-radius: 40px;
+	cursor: pointer;
+}

@@ -28,6 +28,7 @@ def index(request: WSGIRequest) -> HttpResponse:
 
     return render(request, 'index.html', context)
 
+
 def card(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
     selected_bouquet = Bouquet.objects.get(id=bouquet_id)
     bouquet_items = BouquetItemsInBouquet.objects.filter(bouquet=selected_bouquet).all()
@@ -39,7 +40,7 @@ def card(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
 
 
 def catalog(request: WSGIRequest) -> HttpResponse:
-    bouquets =Bouquet.objects.all()
+    bouquets = Bouquet.objects.all()
     context = {'bouquets': bouquets}
     return render(request, 'catalog.html', context)
 
