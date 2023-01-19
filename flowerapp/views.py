@@ -26,3 +26,43 @@ def index(request: WSGIRequest) -> HttpResponse:
             context['success_alert_style'] = 'block'
 
     return render(request, 'index.html', context)
+
+
+def card(request: WSGIRequest) -> HttpResponse:
+    context = {}
+    return render(request, 'card.html', context)
+
+
+def catalog(request: WSGIRequest) -> HttpResponse:
+    context = {}
+    return render(request, 'catalog.html', context)
+
+
+def consultation(request: WSGIRequest) -> HttpResponse:
+    context = {}
+    return render(request, 'consultation.html', context)
+
+
+def order(request: WSGIRequest) -> HttpResponse:
+    context = {}
+    return render(request, 'order.html', context)
+
+
+def order_step(request: WSGIRequest) -> HttpResponse:
+    context = {}
+    return render(request, 'order-step.html', context)
+
+
+def quiz(request: WSGIRequest) -> HttpResponse:
+    context = {}
+    return render(request, 'quiz.html', context)
+
+
+def quiz_step(request: WSGIRequest) -> HttpResponse:
+    context = {}
+    return render(request, 'quiz-step.html', context)
+
+
+def result(request: WSGIRequest) -> HttpResponse:
+    context = {}
+    return render(request, 'result.html', context)
