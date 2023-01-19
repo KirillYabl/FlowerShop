@@ -1,3 +1,5 @@
+{% load static %}
+{% load format_thousands %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,16 +7,16 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Flower Shop</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Unbounded:wght@700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="css/main.css">	
+	<link rel="stylesheet" href="{% static 'css/main.css' %}">	
 </head>
 <body>
 	<header id="header">
 		<div class="container">
 			<div class="header ficb">
-				<a href="/"><img src="img/logo.svg" alt="logo" class="logo"></a>
+				<a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
 				<nav>
 					<ul class="menu ficc">
-						<li class="menu__item"><a href="#" class="menu__item_link">Каталог</a></li>
+						<li class="menu__item"><a href="{% url 'catalog' %}" class="menu__item_link">Каталог</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
 					</ul>
@@ -26,48 +28,29 @@
 		<div class="container">
 			<div class="card ficb">
 				<div class="card__block card__block_first">
-					<img src="img/cardImg.jpg" alt="img" class="card__img">
+					<img src="{{ bouquet.photo.url }}" alt="img" class="card__img">
 				</div>
 				<div class="card__block card__block_sec">
-					<div class="title">Летнее утро</div>
-					<div class="card__block_price">3 600 руб</div>
+					<div class="title">{{ bouquet.name }}</div>
+					<div class="card__block_price">{{ bouquet.price|floatformat:'0'|format_thousands }} руб</div>
 					<div class="card__elems ">
 						<span class="card__elems_intro">Состав</span>
 						<div class="card__items">
+							{% for bouquet_item in bouquet_items %}
 							<span class="card_items_intro">
-								Гортензия розовая - 1 шт.
+								{{ bouquet_item.item }} - {{ bouquet_item.count }} шт.
 							</span>
-							<span class="card_items_intro">
-								Ветки эквалипта - 5 шт.
-							</span>
-							<span class="card_items_intro">
-								Гипсофила - 1 шт.
-							</span>
-							<span class="card_items_intro">
-								Матовая упаковка - 1 шт.
-							</span>
-							<span class="card_items_intro">
-								Лента атласная - 1 шт.
-							</span>
-							<span class="card_items_intro">
-								Рекомендация по уходу - 1 шт.
-							</span>
-							<span class="card_items_intro">
-								Открыточка с вашими пожеланиями - 1 шт.
-							</span>
-							<span class="card_items_intro">
-								Любовь флориста (бесплатно) - 1 шт.
-							</span>
+							{% endfor %}
 						</div>
 					</div>
 					<div class="card__elems ">
 						<span class="card__elems_intro">Размер</span>
 						<div class="card__items">
 							<span class="card_items_intro">
-								Высота - 50 см
+								Высота - {{ bouquet.height_cm }} см
 							</span>
 							<span class="card_items_intro">
-								Ширина - 30 см
+								Ширина - {{ bouquet.width_cm }} см
 							</span>
 						</div>
 					</div>
@@ -91,10 +74,10 @@
 	<footer id="footer">
 		<div class="container">
 			<div class="footer">
-				<a href="/"><img src="img/logo.svg" alt="logo" class="logo footer__logo"></a>
+				<a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo footer__logo"></a>
 				<nav>
 					<ul class="menu footer__menu ficc">
-						<li class="menu__item"><a href="#" class="menu__item_link">Каталог</a></li>
+						<li class="menu__item"><a href="{% url 'catalog' %}" class="menu__item_link">Каталог</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
 					</ul>

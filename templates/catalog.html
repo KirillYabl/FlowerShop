@@ -73,7 +73,7 @@
 					</div> -->
 					
 					{% for bouquet in bouquets %}
-					<a href="{% url 'card' %}" style="text-decoration: none; color: #ABABAB;">
+					<a href="{% url 'card' bouquet.id %}" style="text-decoration: none; color: #ABABAB;">
 						<div class="recommended__elems ficb" style="background: url({{ bouquet.photo.url }}) no-repeat center bottom / cover;">
 							<div class="recommended__block ">
 								<div class="recommended__block_elems ficb">
