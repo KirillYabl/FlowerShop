@@ -14,6 +14,8 @@ from .models import Event
 from .models import FlowerShop
 from .models import BouquetItemsInBouquet
 
+from django.db.models import Prefetch
+
 
 def index(request: WSGIRequest) -> HttpResponse:
     success_alert_style = request.COOKIES.get('success_alert_style', 'none')
@@ -40,18 +42,46 @@ def index(request: WSGIRequest) -> HttpResponse:
 
 
 def card(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
-    selected_bouquet = Bouquet.objects.get(id=bouquet_id)
-    bouquet_items = BouquetItemsInBouquet.objects.filter(bouquet=selected_bouquet).all()
+    # selected_bouquet = Bouquet.objects.get(id=bouquet_id)
+    bouquets = Bouquet.objects.prefetch_related(
+        Prefetch(
+          "items",
+          queryset=BouquetItemsInBouquet.objects.filter(bouquet=bouquet_id),
+          to_attr="curent_items",
+       )
+    )
+    selected_bouquet = bouquets.get(id=bouquet_id)
+    # bouquet_items = BouquetItemsInBouquet.objects.filter(bouquet=selected_bouquet).all()
+    bouquet_items = selected_bouquet.curent_items
+    price_order = float(selected_bouquet.price)
+    # link_order = f'https://arsenalpay.ru/widget.html?widget=13711&destination=12345&amount={price_order}'
     context = {
         'bouquet': selected_bouquet,
         'bouquet_items': bouquet_items,
+        'success_alert_style': 'none',
+        'form': ConsultationForm(class_name='consultation__form_input'),
+        # 'link_order': link_order,
     }
+    if request.method == 'POST':
+        context['form'] = ConsultationForm(request.POST)
+        if context['form'].is_valid():
+            context['form'].save()
+            context['success_alert_style'] = 'block'
     return render(request, 'card.html', context)
 
 
 def catalog(request: WSGIRequest) -> HttpResponse:
-    bouquets = Bouquet.objects.all()
-    context = {'bouquets': bouquets}
+    bouquets =Bouquet.objects.all()
+    context = {
+        'bouquets': bouquets,
+        'success_alert_style': 'none',
+        'form': ConsultationForm(class_name='consultation__form_input'),
+    }
+    if request.method == 'POST':
+        context['form'] = ConsultationForm(request.POST)
+        if context['form'].is_valid():
+            context['form'].save()
+            context['success_alert_style'] = 'block'
     return render(request, 'catalog.html', context)
 
 
@@ -70,8 +100,14 @@ def consultation(request: WSGIRequest) -> HttpResponse:
     return render(request, 'consultation.html', context)
 
 
-def order(request: WSGIRequest) -> HttpResponse:
-    context = {}
+def order(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
+    selected_bouquet = Bouquet.objects.get(id=bouquet_id)
+    price_order = float(selected_bouquet.price)
+    link_order = f'https://arsenalpay.ru/widget.html?widget=13711&destination=12345&amount={price_order}'
+    context = {
+        'link_order': link_order,
+        'id': bouquet_id,
+    }
     return render(request, 'order.html', context)
 
 
