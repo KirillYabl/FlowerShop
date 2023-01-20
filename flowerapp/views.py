@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from .forms import ConsultationForm
 from .forms import CustomEventForm
+from .forms import OrderForm
 from .models import Bouquet
 from .models import Consultation
 from .models import Event
@@ -15,6 +16,7 @@ from .models import FlowerShop
 from .models import BouquetItemsInBouquet
 
 from django.db.models import Prefetch
+from environs import Env
 
 
 def index(request: WSGIRequest) -> HttpResponse:
@@ -101,13 +103,29 @@ def consultation(request: WSGIRequest) -> HttpResponse:
 
 
 def order(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
+    env = Env()
+    env.read_env()
+    link_pay = env.str('LINK_PAY')
+
+    form = OrderForm()
+    
     selected_bouquet = Bouquet.objects.get(id=bouquet_id)
     price_order = float(selected_bouquet.price)
-    link_order = f'https://arsenalpay.ru/widget.html?widget=13711&destination=12345&amount={price_order}'
+    link_order = f'{link_pay}{price_order}'
     context = {
         'link_order': link_order,
         'id': bouquet_id,
+        'form': form,
     }
+
+    if request.method == 'POST':
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+            response = redirect(link_order)
+            return response
+        else:
+            form = OrderForm()
     return render(request, 'order.html', context)
 
 
