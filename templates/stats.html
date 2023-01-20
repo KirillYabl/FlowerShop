@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load static %}
+{% load format_thousands %}
+{% block first-section %}
+<section id="result">
+  <div class="container">
+    <div class="result p100">
+      <div class="title">Дашборд</div>
+      <div class="result__block ficb">
+        <div>
+          <form action="#consultation" class="consultation__form">
+            <select name="period" class="quiz__form_input" id="period">
+              <option value="today">Сегодня</option>
+              <option value="week">Последняя неделя</option>
+            </select>
+            <select name="bouquet" class="quiz__form_input" id="bouquet">
+              <option value="any">Любой</option>
+              <option value="весенний">Весенний</option>
+            </select>
+            <button type="submit" class="quiz__elem">Отправить</button>
+          </form>
+        </div>
+      </div>
+      <br>
+      <div class="result__block ficb">
+        <div class="stats__items">
+          <canvas id="dayHourDistribution"></canvas>
+        </div>
+        <div class="stats__items">
+          <canvas id="ordersDistribution"></canvas>
+        </div>
+      </div>
+      <br>
+      <div class="result__block ficb">
+        <div class="stats__items">
+          <div class="title result__items_title">Данные по клиентам</div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Сумма оплат:</div>
+            29 000 руб
+          </div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Заказанных букетов:</div>
+            12
+          </div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Уникальных клиентов:</div>
+            9
+          </div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Оказанных консультаций:</div>
+            35
+          </div>
+        </div>
+        <div class="stats__items">
+          <div class="title result__items_title">Данные по заказам</div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Среднее время от заказа до доставки:</div>
+            3 ч. 18 мин.
+          </div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Среднее время от заказа до сбора:</div>
+            1 ч. 58 мин.
+          </div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Среднее время от сбора до доставки:</div>
+            1 ч. 20 мин.
+          </div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Самое популярное окно доставки:</div>
+            с 16:00 до 18:00
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const dhd = document.getElementById('dayHourDistribution');
+
+  new Chart(dhd, {
+    type: 'line',
+    data: {
+      datasets: [{
+        label: '% заказов от всех в данный час',
+        data: {
+          8: 2,
+          9: 4,
+          10: 7,
+          11: 9,
+          12: 11,
+          13: 9,
+          14: 9,
+          15: 10,
+          16: 14,
+          17: 16,
+          18: 6,
+          19: 2,
+          20: 1,
+        },
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: 'Распределение времени заказов по часам'
+        }
+      }
+    }
+  });
+
+  const od = document.getElementById('ordersDistribution');
+
+  new Chart(od, {
+    type: 'bar',
+    data: {
+      datasets: [{
+        label: 'Распределение заказов по времени',
+        data: {
+          'Январь \'22': 567,
+          'Февраль \'22': 478,
+          'Март \'22': 673,
+          'Апрель \'22': 698,
+          'Май \'22': 976,
+          'Июнь \'22': 765,
+          'Июль \'22': 675,
+          'Август \'22': 880,
+          'Сентябрь \'22': 1124,
+          'Октябрь \'22': 736,
+          'Ноябрь \'22': 632,
+          'Декабрь \'22': 658,
+        },
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: 'Распределение времени заказов по часам'
+        }
+      }
+    }
+  });
+
+
+</script>
+{% endblock first-section %}
+{% block contacts %}{% endblock contacts %}
+{% block consultation %}{% endblock consultation %}

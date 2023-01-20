@@ -863,3 +863,11 @@ color: #FFFFFF;
 	border-radius: 40px;
 	cursor: pointer;
 }
+
+/* stats items */
+.stats__items {
+	width: 45%;
+	border: 1px solid #17CF97;
+	text-align: center;
+	padding: 19px 28px;
+}

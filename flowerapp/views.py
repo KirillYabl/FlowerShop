@@ -215,3 +215,9 @@ def result(request: WSGIRequest) -> HttpResponse:
 
     context = {'bouquet': selected_bouquet}
     return render(request, 'result.html', context)
+
+
+@login_required
+def stats(request: WSGIRequest) -> HttpResponse:
+    context = {}
+    return render(request, 'stats.html', context)
