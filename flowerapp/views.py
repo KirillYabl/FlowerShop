@@ -59,7 +59,7 @@ def card(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
         'bouquet': selected_bouquet,
         'bouquet_items': bouquet_items,
         'success_alert_style': 'none',
-        'form': ConsultationForm(),
+        'form': ConsultationForm(class_name='consultation__form_input'),
         # 'link_order': link_order,
     }
     if request.method == 'POST':
@@ -72,7 +72,16 @@ def card(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
 
 def catalog(request: WSGIRequest) -> HttpResponse:
     bouquets =Bouquet.objects.all()
-    context = {'bouquets': bouquets}
+    context = {
+        'bouquets': bouquets,
+        'success_alert_style': 'none',
+        'form': ConsultationForm(class_name='consultation__form_input'),
+    }
+    if request.method == 'POST':
+        context['form'] = ConsultationForm(request.POST)
+        if context['form'].is_valid():
+            context['form'].save()
+            context['success_alert_style'] = 'block'
     return render(request, 'catalog.html', context)
 
 
