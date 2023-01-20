@@ -136,11 +136,6 @@ def order(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
     return render(request, 'order.html', context)
 
 
-def order_step(request: WSGIRequest) -> HttpResponse:
-    context = {}
-    return render(request, 'order-step.html', context)
-
-
 def quiz(request: WSGIRequest) -> HttpResponse:
     event = request.GET.get('event', None)
     price_from = request.GET.get('price_from', None)
