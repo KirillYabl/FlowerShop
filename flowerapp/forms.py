@@ -75,30 +75,22 @@ class OrderForm(forms.Form):
         ('5', 'с 16:00 до 18:00'),
         ('6', 'с 18:00 до 20:00')
     ]
-    title = forms.CharField(max_length=200)
     name = forms.CharField(max_length=200, label='', 
-                            widget=forms.TextInput(attrs={'placeholder': 'Введите Имя'}))
+                            widget=forms.TextInput(attrs={
+                                'name': 'fname',
+                                'class': 'order__form_input',
+                                'placeholder': 'Введите Имя'
+                            }))
     phone = PhoneNumberField(region='RU', label='',
-                             widget=RegionalPhoneNumberWidget(attrs={'placeholder': '+ 7(999) 000 00 00'}))
+                             widget=RegionalPhoneNumberWidget(attrs={
+                                'name': 'tel',
+                                'class': 'order__form_input',
+                                'placeholder': '+ 7(999) 000 00 00'
+                            }))
     delivery_address = forms.CharField(max_length=200, label='', 
-                            widget=forms.TextInput(attrs={'placeholder': 'Адрес доставки'}))
-    delivery_window = forms.ChoiceField(widget=forms.RadioSelect(), choices=CHOICES)
-
-
-class OrderForm(forms.Form):
-    CHOICES = [
-        ('1', 'Как можно скорее'),
-        ('2', 'с 10:00 до 12:00'),
-        ('3', 'с 12:00 до 14:00'),
-        ('4', 'с 14:00 до 16:00'),
-        ('5', 'с 16:00 до 18:00'),
-        ('6', 'с 18:00 до 20:00')
-    ]
-    title = forms.CharField(max_length=200)
-    name = forms.CharField(max_length=200, label='', 
-                            widget=forms.TextInput(attrs={'placeholder': 'Введите Имя'}))
-    phone = PhoneNumberField(region='RU', label='',
-                             widget=RegionalPhoneNumberWidget(attrs={'placeholder': '+ 7(999) 000 00 00'}))
-    delivery_address = forms.CharField(max_length=200, label='', 
-                            widget=forms.TextInput(attrs={'placeholder': 'Адрес доставки'}))
-    delivery_window = forms.ChoiceField(widget=forms.RadioSelect(), choices=CHOICES)
+                            widget=forms.TextInput(attrs={
+                                'name': 'adres',
+                                'class': 'order__form_input',
+                                'placeholder': 'Адрес доставки'
+                            }))
+    delivery_window = forms.ChoiceField(widget=forms.RadioSelect(attrs={'class': 'order__form_radio'}), choices=CHOICES)
