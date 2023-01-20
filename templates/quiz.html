@@ -1,35 +1,117 @@
 {% extends "base.html" %}
 {% load static %}
 {% block first-section %}
-	<section id="quiz">
-		<div class="container">
-			<div class="quiz">
-				<div class="quiz__back ">
-					<a href="#" class="quiz__back_link fic"><img src="{% static 'img/arrow-left.svg' %}" alt="arrow-left" class="arrowLeft">
-					<span class="quiz__back_intro">Назад</span></a>
-				</div>
-				<div class="quiz__block">
-					<h1 class="quiz__title">К какому событию нужен букет?</h1>
-					<div class="quiz__elems fic">
-						<button class="quiz__elem">Свадьба</button>
-						<button class="quiz__elem">День рождения</button>
-						<button class="quiz__elem">Без повода</button>
-					</div>
-					<div class="quiz__progress">
-						<div class="quiz__progress_step">
-							<span class="quiz__progress_num">1</span>
-							<span class="quiz__progress_in"> шаг из </span>
-							<span class="quiz__progress_num">2</span>
-						</div>
-						<div class="quiz__progress_line">
-							<div class="quiz__progress_lineActive"></div>
-						</div>
-					</div>
-				</div>
-				
-			</div>
-		</div>
-	</section>
+<section id="quiz">
+  <div class="container">
+    <div class="quiz">
+      <div class="quiz__back ">
+        <a href="{% if step == 1 %}{% url 'index' %}{% else %}{% url 'quiz' %}{% endif %}"
+           class="quiz__back_link fic"><img src="{% static 'img/arrow-left.svg' %}"
+                                            alt="arrow-left"
+                                            class="arrowLeft">
+          <span class="quiz__back_intro">Назад</span></a>
+      </div>
+      {% if step == 1 %}
+      <div class="quiz__block">
+        <h1 class="quiz__title">К какому событию нужен букет?</h1>
+        <div class="quiz__elems fic">
+          {% for event in events %}
+          <form action="{% url 'quiz' %}">
+            <button class="quiz__elem" name="event" value="{{ event.id }}">{{ event.name }}</button>
+            <input type="hidden" name="custom" value="false"/>
+          </form>
+          {% endfor %}
+        </div>
+        <div class="quiz__elems_sec fic">
+          <form action="{% url 'quiz' %}" method="get">
+            {% for field in form %}
+            {{ field }}
+            {% endfor %}
+            <button class="quiz__elem" type="submit" name="custom" value="true">Другое</button>
+            {% if form.errors %}
+            <ul>
+              {% for field in form %}
+              {% for error in field.errors %}
+              <li>{{ error|escape }}</li>
+              {% endfor %}
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </form>
+          <!--          <form action="{% url 'quiz' %}">-->
+          <!--            <input style="color: #000000" type="text" name="event" class="order__form_input"-->
+          <!--                   placeholder="Введите свой повод" required/>-->
+          <!--            <button class="quiz__elem" type="submit" name="custom" value="true">Другое</button>-->
+          <!--          </form>-->
+        </div>
+        <div class="quiz__progress">
+          <div class="quiz__progress_step">
+            <span class="quiz__progress_num">1</span>
+            <span class="quiz__progress_in"> шаг из </span>
+            <span class="quiz__progress_num">2</span>
+          </div>
+          <div class="quiz__progress_line">
+            <div class="quiz__progress_lineActive"></div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="quiz__block">
+        <h1 class="quiz__title">На какой бюджет рассчитываете?</h1>
+        <div class="quiz__elems fic">
+          <form action="{{ anchor }}">
+            <button class="quiz__elem" type="submit">До 1 000 руб</button>
+            <input type="hidden" name="price_from" value="0"/>
+            <input type="hidden" name="price_to" value="1000"/>
+            <input type="hidden" name="event" value="{{ event }}"/>
+            <input type="hidden" name="custom" value="{{ custom }}"/>
+            <input type="hidden" name="client_name" value="{{ client_name }}"/>
+            <input type="hidden" name="phone" value="{{ phone }}"/>
+          </form>
+          <form action="{{ anchor }}">
+            <button class="quiz__elem">1 000 - 5 000 руб</button>
+            <input type="hidden" name="price_from" value="1000"/>
+            <input type="hidden" name="price_to" value="5000"/>
+            <input type="hidden" name="event" value="{{ event }}"/>
+            <input type="hidden" name="custom" value="{{ custom }}"/>
+            <input type="hidden" name="client_name" value="{{ client_name }}"/>
+            <input type="hidden" name="phone" value="{{ phone }}"/>
+          </form>
+          <form action="{{ anchor }}">
+            <button class="quiz__elem">от 5 000 руб</button>
+            <input type="hidden" name="price_from" value="5000"/>
+            <input type="hidden" name="price_to" value="999999999"/>
+            <input type="hidden" name="event" value="{{ event }}"/>
+            <input type="hidden" name="custom" value="{{ custom }}"/>
+            <input type="hidden" name="client_name" value="{{ client_name }}"/>
+            <input type="hidden" name="phone" value="{{ phone }}"/>
+          </form>
+          <form action="{{ anchor }}">
+            <button class="quiz__elem">Не имеет значения</button>
+            <input type="hidden" name="price_from" value="0"/>
+            <input type="hidden" name="price_to" value="999999999"/>
+            <input type="hidden" name="event" value="{{ event }}"/>
+            <input type="hidden" name="custom" value="{{ custom }}"/>
+            <input type="hidden" name="client_name" value="{{ client_name }}"/>
+            <input type="hidden" name="phone" value="{{ phone }}"/>
+          </form>
+        </div>
+        <div class="quiz__progress">
+          <div class="quiz__progress_step">
+            <span class="quiz__progress_num">2</span>
+            <span class="quiz__progress_in"> шаг из </span>
+            <span class="quiz__progress_num">2</span>
+          </div>
+          <div class="quiz__progress_line">
+            <div class="quiz__progress_lineActive2"></div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</section>
 {% endblock first-section %}
 {% block contacts %}{% endblock contacts %}
 {% block consultation %}{% endblock consultation %}

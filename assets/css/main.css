@@ -264,7 +264,7 @@ color: #FFFFFF;
 	border-radius: 5px;
 	font-size: 16px;
 	line-height: 103.52%;
-	color: rgba(0, 0, 0, .3);
+	color: rgba(0, 0, 0);
 	margin-right: 10px;
 }
 .consultation__form_btn {
@@ -427,6 +427,9 @@ margin-bottom: 30px;
 	line-height: 103.52%;
 	color: #2D2D2D;
 }
+.quiz__elems_sec {
+    margin-top: 10px;
+}
 .quiz__elem {
 	font-weight: 500;
 	font-size: 16px;
@@ -482,6 +485,31 @@ margin-bottom: 30px;
 	border-radius: 10px;
 	width: 8px;
 	height: 8px;
+}
+
+.quiz__progress_lineActive2 {;
+	position: absolute;
+	background: #17CF97;
+	border-radius: 10px;
+	width: 50%;
+	height: 8px;
+}
+
+.quiz__form_input {
+	width: 240px;
+	height: 57px;
+
+	background: #F4F4F4;
+	border-radius: 5px;
+	padding-left: 30px;
+	padding-right: 15px;
+	border: none;
+	font-size: 16px;
+line-height: 103.52%;
+/* identical to box height, or 17px */
+/*	margin-right: 10px;*/
+	outline: none;
+color: rgba(0, 0, 0);
 }
 
 /*result.html*/
@@ -742,7 +770,6 @@ margin-bottom: 5px;
 line-height: 145.02%;
 /* identical to box height, or 15px */
 
-
 /* черный */
 
 color: #2D2D2D;
@@ -750,6 +777,22 @@ color: #2D2D2D;
 opacity: 0.3;
 }
 
+.singUpConsultation__form_input {
+	width: 240px;
+	height: 57px;
+
+	background: #F4F4F4;
+	border-radius: 5px;
+	padding-left: 30px;
+	padding-right: 15px;
+	border: none;
+	font-size: 16px;
+line-height: 103.52%;
+/* identical to box height, or 17px */
+/*	margin-right: 10px;*/
+	outline: none;
+color: rgba(0, 0, 0);
+}
 
 /* Алерт */
 .success-alert {
@@ -771,4 +814,52 @@ opacity: 0.3;
 
 .closebtn:hover {
   color: black;
+}
+
+/* Login.html */
+#login {
+	padding-top: 37px;
+	padding-bottom: 49px;
+	background: #17CF97;
+}
+.login__title {
+	line-height: 103.52%;
+/* or 37px */
+margin-bottom: 19px;
+	text-align: center;
+color: #FFFFFF;
+}
+.login__form {
+	width: 655px;
+	margin: 0 auto;
+}
+.login__form_input {
+	padding-left: 30px;
+	padding-right: 7px;
+
+	width: 240px;
+	height: 57px;
+	border: none;
+	outline: none;
+	background: #FFFFFF;
+	border-radius: 5px;
+	font-size: 16px;
+	line-height: 103.52%;
+	color: rgba(0, 0, 0, .3);
+	margin-right: 10px;
+}
+.login__form_btn {
+	font-weight: 500;
+	font-size: 16px;
+	line-height: 103.52%;
+	/* identical to box height, or 17px */
+
+
+	color: #FFFFFF;
+	width: 141px;
+	height: 57px;
+	background: transparent;
+	border: 1px solid #FFFFFF;
+	border-radius: 40px;
+	cursor: pointer;
 }

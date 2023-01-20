@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+{% block contacts %}{% endblock contacts %}
+{% block consultation %}{% endblock consultation %}
+{% block first-section %}
+<section id="login">
+  <div class="container">
+    <div class="login">
+      <div class="title login__title">Вход</div>
+      <form class="login__form" method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        {% if invalid %}
+        <div class="alert alert-danger" role="alert">Неверный логин / пароль.</div>
+        {% endif %}
+
+        <input type="hidden" name="next" value="{{ request.GET.next }}"/>
+        {{ form }}
+        <button type="submit" class="login__form_btn">Отправить</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock first-section %}
