@@ -24,10 +24,10 @@ def index(request: WSGIRequest) -> HttpResponse:
         'bouquets': bouquets,
         'flower_shops': flower_shops,
         'success_alert_style': success_alert_style,
-        'form': ConsultationForm()
+        'form': ConsultationForm(class_name='consultation__form_input')
     }
     if request.method == 'POST':
-        context['form'] = ConsultationForm(request.POST)
+        context['form'] = ConsultationForm(request.POST, class_name='consultation__form_input')
         if context['form'].is_valid():
             context['form'].save()
             response = redirect('index')
@@ -56,7 +56,17 @@ def catalog(request: WSGIRequest) -> HttpResponse:
 
 
 def consultation(request: WSGIRequest) -> HttpResponse:
-    context = {}
+    context = {'form': ConsultationForm(class_name='singUpConsultation__form_input')}
+
+    if request.method == 'POST':
+        context['form'] = ConsultationForm(request.POST, class_name='singUpConsultation__form_input')
+        if context['form'].is_valid():
+            context['form'].save()
+            response = redirect('index')
+            expires_seconds = 3
+            expires = timezone.now() + timezone.timedelta(seconds=expires_seconds)
+            response.set_cookie('success_alert_style', 'block', expires=expires)
+            return response
     return render(request, 'consultation.html', context)
 
 

@@ -770,7 +770,6 @@ margin-bottom: 5px;
 line-height: 145.02%;
 /* identical to box height, or 15px */
 
-
 /* черный */
 
 color: #2D2D2D;
@@ -778,6 +777,22 @@ color: #2D2D2D;
 opacity: 0.3;
 }
 
+.singUpConsultation__form_input {
+	width: 240px;
+	height: 57px;
+
+	background: #F4F4F4;
+	border-radius: 5px;
+	padding-left: 30px;
+	padding-right: 15px;
+	border: none;
+	font-size: 16px;
+line-height: 103.52%;
+/* identical to box height, or 17px */
+/*	margin-right: 10px;*/
+	outline: none;
+color: rgba(0, 0, 0);
+}
 
 /* Алерт */
 .success-alert {

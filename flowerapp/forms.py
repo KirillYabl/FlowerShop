@@ -27,10 +27,11 @@ class ConsultationForm(forms.ModelForm):
         model = Consultation
         fields = ['client_name', 'phone']
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, class_name, **kwargs):
         super().__init__(*args, **kwargs)
         for visible in self.visible_fields():
-            visible.field.widget.attrs['class'] = 'consultation__form_input'
+            if class_name:
+                visible.field.widget.attrs['class'] = class_name
 
 
 class CustomEventForm(forms.Form):
