@@ -8,15 +8,23 @@
       <div class="title">Дашборд</div>
       <div class="result__block ficb">
         <div>
-          <form action="#consultation" class="consultation__form">
-            <select name="period" class="quiz__form_input" id="period">
-              <option value="today">За все время</option>
+          <form action="" class="consultation__form">
+            <select style="margin-right: 7px" name="period" class="quiz__form_input" id="period">
+              <option value="all">За все время</option>
               <option value="today">Сегодня</option>
-              <option value="week">Последняя неделя</option>
+              <option value="week">За неделю</option>
+              <option value="month">За месяц</option>
+              <option value="year">За год</option>
+              <option value="this_month">Этот месяц</option>
+              <option value="this_year">Этот год</option>
+              <option value="previous_month">Прошлый месяц</option>
+              <option value="previous_year">Прошлый год</option>
             </select>
-            <select name="bouquet" class="quiz__form_input" id="bouquet">
+            <select style="margin-right: 7px" name="bouquet" class="quiz__form_input" id="bouquet">
               <option value="any">Любой</option>
-              <option value="весенний">Весенний</option>
+              {% for bouquet in bouquets %}
+              <option value="{{ bouquet.id }}">{{ bouquet.name }}</option>
+              {% endfor %}
             </select>
             <button type="submit" class="quiz__elem">Отправить</button>
           </form>
@@ -94,21 +102,13 @@
       datasets: [{
         label: '% заказов от всех в данный час',
         data: {
-          8: 2,
-          9: 4,
-          10: 7,
-          11: 9,
-          12: 11,
-          13: 9,
-          14: 9,
-          15: 10,
-          16: 14,
-          17: 16,
-          18: 6,
-          19: 2,
-          20: 1,
+          {% for item in by_hours_distribution %}
+          {{ item.hour }}: {{ item.percent }},
+          {% endfor %}
         },
-        borderWidth: 1
+        borderWidth: 1,
+        borderColor: '#17CF97',
+        backgroundColor: '#17CF97',
       }]
     },
     options: {
@@ -132,22 +132,15 @@
     type: 'bar',
     data: {
       datasets: [{
-        label: 'Распределение заказов по времени',
+        label: 'Количество заказов в данный промежуток времени',
         data: {
-          'Январь \'22': 567,
-          'Февраль \'22': 478,
-          'Март \'22': 673,
-          'Апрель \'22': 698,
-          'Май \'22': 976,
-          'Июнь \'22': 765,
-          'Июль \'22': 675,
-          'Август \'22': 880,
-          'Сентябрь \'22': 1124,
-          'Октябрь \'22': 736,
-          'Ноябрь \'22': 632,
-          'Декабрь \'22': 658,
+          {% for item in by_time_distribution %}
+          "{{ item.t }}": {{ item.num }},
+          {% endfor %}
         },
-        borderWidth: 1
+        borderWidth: 1,
+        borderColor: '#17CF97',
+        backgroundColor: '#17CF97',
       }]
     },
     options: {
@@ -159,7 +152,7 @@
       plugins: {
         title: {
           display: true,
-          text: 'Распределение времени заказов по часам'
+          text: 'Распределение заказов по времени'
         }
       }
     }

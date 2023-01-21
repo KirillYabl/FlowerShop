@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 from django.contrib.auth.decorators import login_required
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
+from django.db.models.functions import Concat
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -20,7 +21,7 @@ from .models import Event
 from .models import FlowerShop
 from .models import Order
 
-from django.db.models import Prefetch, Sum, Count, F, Case, When, Value, Avg
+from django.db.models import Prefetch, Sum, Count, F, Case, When, Value, Avg, Min, ExpressionWrapper
 from environs import Env
 
 
@@ -223,17 +224,55 @@ def result(request: WSGIRequest) -> HttpResponse:
 
 @login_required
 def stats(request: WSGIRequest) -> HttpResponse:
+    period = request.GET.get('period', 'all')
+    bouquet = request.GET.get('bouquet', 'any')
     orders = Order.objects.exclude(status=Order.Status.cancelled)
-    delivery_window_id = orders.values('delivery_window').annotate(
-        num=Count('delivery_window')).order_by('-num')[0]['delivery_window']
+    consultations = Consultation.objects.all()
 
-    records = orders.annotate(
-        delivered_date=F('delivered_at__date'),
-        composed_date=F('composed_at__date'),
-        created_date=F('created_at__date'),
-        delivered_time=F('delivered_at__time'),
-        composed_time=F('composed_at__time'),
-    )
+    filter_params = {}
+
+    if period != 'all':
+        if period == 'today':
+            filter_params['created_at__date'] = timezone.now().date()
+        elif period == 'week':
+            filter_params['created_at__date__gt'] = timezone.now().date() - timezone.timedelta(days=7)
+        elif period == 'month':
+            filter_params['created_at__date__gt'] = timezone.now().date() - timezone.timedelta(days=31)
+        elif period == 'year':
+            filter_params['created_at__date__gt'] = timezone.now().date() - timezone.timedelta(days=365)
+        elif period == 'this_month':
+            filter_params['created_at__month'] = timezone.now().date().month
+            filter_params['created_at__year'] = timezone.now().date().year
+        elif period == 'this_year':
+            filter_params['created_at__year'] = timezone.now().date().year
+        elif period == 'previous_month':
+            filter_params[
+                'created_at__month'] = timezone.now().date().month - 1 if timezone.now().date().month != 1 else 12
+            filter_params['created_at__year'] = timezone.now().date().year if filter_params[
+                                                                                  'created_at__month'] != 12 else timezone.now().date().year - 1
+        elif period == 'previous_year':
+            filter_params['created_at__year'] = timezone.now().date().year - 1
+
+    if filter_params:
+        consultations = consultations.filter(**filter_params)
+
+    if bouquet != 'any':
+        try:
+            int(bouquet)
+            bouquet = Bouquet.objects.get(id=int(bouquet))
+            filter_params['bouquet'] = bouquet
+        except (ValueError, Bouquet.DoesNotExist):
+            pass
+
+    if filter_params:
+        orders = orders.filter(**filter_params)
+
+    try:
+        delivery_window_id = orders.values('delivery_window').annotate(
+            num=Count('delivery_window')).order_by('-num')[0]['delivery_window']
+        most_popular_window = DeliveryWindow.objects.get(id=delivery_window_id).name
+    except IndexError:
+        most_popular_window = 'Не определено'
 
     orders_dt_aggregated = orders.annotate(
         delivered_date=F('delivered_at__date'),
@@ -263,26 +302,75 @@ def stats(request: WSGIRequest) -> HttpResponse:
         compose_to_delivery_avg_time=Avg('compose_to_delivery_time'),
     )
 
+    by_hours_distribution = list(orders.annotate(hour=F('created_at__hour')).values('hour').annotate(
+        num=Count('hour')).order_by('hour'))
+    all_count = sum([item['num'] for item in by_hours_distribution])
+    by_hours_distribution = [
+        {
+            'hour': item['hour'],
+            'percent': str(round((item['num'] / all_count) * 100, 1)).replace(',', '.')
+        }
+        for item
+        in by_hours_distribution
+    ]
+
+    first_order = orders.aggregate(dt=Min('created_at'))['dt']
+    if period == 'today':
+        by_time_distribution = list(orders.annotate(t=F('created_at__hour')).values('t').annotate(
+            num=Count('t')).order_by('t'))
+    elif period in ('week', 'month', 'this_month', 'previous_month') or (timezone.now() - first_order).days < 120:
+        by_time_distribution = list(orders.annotate(t=F('created_at__date')).values('t').annotate(
+            num=Count('t')).order_by('t'))
+    elif period in ('year', 'this_year', 'previous_year') or (timezone.now() - first_order).days < 365 * 2:
+        by_time_distribution = list(orders.annotate(
+            t=Case(
+                When(
+                    created_at__month__in=[10, 11, 12],
+                    then=Concat(
+                        F('created_at__year'), Value('.'), F('created_at__month'),
+                        output_field=models.CharField()
+                    )
+                ),
+                When(
+                    created_at__month__in=[i for i in range(1, 10)],
+                    then=Concat(
+                        F('created_at__year'), Value('.0'), F('created_at__month'),
+                        output_field=models.CharField()
+                    )
+                )
+            )
+        ).values('t').annotate(num=Count('t')).order_by('t'))
+    else:
+        by_time_distribution = list(orders.annotate(t=F('created_at__year')).values('t').annotate(
+            num=Count('t')).order_by('t'))
+
     class TimedeltaWrapper:
         def __init__(self, td: datetime.timedelta):
             self.td = td
 
         @property
         def hours(self):
-            return self.td.seconds // 3600
+            if self.td:
+                return self.td.seconds // 3600
+            return '---'
 
         @property
         def minutes60(self):
-            return (self.td.seconds // 60) % 60
+            if self.td:
+                return (self.td.seconds // 60) % 60
+            return '---'
 
     context = {
+        'bouquets': Bouquet.objects.all(),
         'orders_sum': orders.aggregate(orders_sum=Sum('price'))['orders_sum'],
         'orders_count': orders.count(),
         'unique_clients_count': orders.values_list('phone', flat=True).distinct().count(),
-        'consultations_count': Consultation.objects.count(),
+        'consultations_count': consultations.count(),
         'order_to_delivery_avg_time': TimedeltaWrapper(orders_dt_aggregated['order_to_delivery_avg_time']),
         'order_to_compose_avg_time': TimedeltaWrapper(orders_dt_aggregated['order_to_compose_avg_time']),
         'compose_to_delivery_avg_time': TimedeltaWrapper(orders_dt_aggregated['compose_to_delivery_avg_time']),
-        'most_popular_window': DeliveryWindow.objects.get(id=delivery_window_id).name
+        'most_popular_window': most_popular_window,
+        'by_hours_distribution': by_hours_distribution,
+        'by_time_distribution': by_time_distribution
     }
     return render(request, 'stats.html', context)
