@@ -62,9 +62,20 @@
 </section>
 {% endblock contacts %}
 {% block consultation %}
-<div class="success-alert" style="display: {{ success_alert_style|default:'none' }}">
-  <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-  <strong>Успешно!</strong> Менеджер перезвонит вам в течение 20 минут для консультации
+<!--<div class="success-alert" style="display: {{ success_alert_style|default:'none' }}">-->
+<!--  <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>-->
+<!--  <strong>Успешно!</strong> Менеджер перезвонит вам в течение 20 минут для консультации-->
+<!--</div>-->
+<div id="success-alert" class="success-alert" style="display: {{ success_alert_style|default:'none' }}">
+  <div class="success-alert-content">
+    <div class="success-alert-header">
+      <span class="closebtn" onclick="this.parentElement.parentElement.parentElement.style.display='none';">&times;</span>
+      <h2>Успешно!</h2>
+    </div>
+    <div class="success-alert-body">
+      <p>Менеджер перезвонит вам в течение 20 минут для консультации</p>
+    </div>
+  </div>
 </div>
 <section id="consultation">
   <div class="container">
