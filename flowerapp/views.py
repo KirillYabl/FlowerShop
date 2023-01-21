@@ -143,29 +143,31 @@ def order(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
 
 def quiz(request: WSGIRequest) -> HttpResponse:
     event = request.GET.get('event', None)
-    price_from = request.GET.get('price_from', None)
-    price_to = request.GET.get('price_to', None)
+    price = request.GET.get('price', None)
     custom = request.GET.get('custom', 'false').lower() == 'true'
-    step = 1
-    if event:
-        step = 2
+
+    step = 2 if event else 1
     context = {'events': Event.objects.all(), 'step': step, 'event': event, 'custom': custom}
-    if step == 1:
+
+    if step == 2 and custom:
         context['form'] = CustomEventForm()
-    elif step == 2 and custom:
+        context['anchor'] = '#consultation'
+
+    if event and price:
+        price_from = price.split('-')[0]
+        price_to = price.split('-')[-1]
+
+        if not custom:
+            query_string = urlencode({'event': event, 'price_from': price_from, 'price_to': price_to})
+            return redirect(reverse('result') + '?' + query_string)
+
         context['form'] = CustomEventForm(request.GET)
         context['anchor'] = '#consultation'
         if context['form'].is_valid():
             for name, value in context['form'].cleaned_data.items():
                 context[name] = str(value)
         else:
-            context['step'] = 1
             return render(request, 'quiz.html', context)
-
-    if event and price_from and price_to:
-        if not custom:
-            query_string = urlencode({'event': event, 'price_from': price_from, 'price_to': price_to})
-            return redirect(reverse('result') + '?' + query_string)
         budget = f'От {price_from} до {price_to}'
         consultation_obj = Consultation(
             client_name=context['client_name'],
