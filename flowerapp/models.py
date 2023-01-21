@@ -82,6 +82,33 @@ class FlowerShop(models.Model):
     def __str__(self):
         return self.address
 
+class FlowerShopCatalogItem(models.Model):
+    flower_shop = models.ForeignKey(
+        FlowerShop,
+        related_name='catalog_items',
+        verbose_name='магазин цветов',
+        on_delete=models.CASCADE,
+    )
+    bouquet = models.ForeignKey(
+        Bouquet,
+        on_delete=models.CASCADE,
+        related_name='catalog_items',
+        verbose_name='букет',
+    )
+    availability = models.BooleanField(
+        'в наличии',
+        default=True,
+        db_index=True
+    )
+
+    class Meta:
+        verbose_name = 'пункт каталога магазина цветов'
+        verbose_name_plural = 'пункты каталога магазина цветов'
+        unique_together = [['flower_shop', 'bouquet']]
+
+    def __str__(self):
+        return f'{self.flower_shop.address} - {self.bouquet.name}'
+
 
 class DeliveryWindow(models.Model):
     name = models.CharField('название', max_length=200, unique=True)
@@ -133,6 +160,7 @@ class Order(models.Model):
     )
     email = models.EmailField('email адрес', blank=True)
     paid = models.BooleanField('оплачен')
+    comment = models.TextField('комментарий', blank=True)
     created_at = models.DateTimeField('дата и время создания заказа', default=timezone.now)
     composed_at = models.DateTimeField('дата и время сбора букета флористом', null=True, blank=True)
     delivered_at = models.DateTimeField('дата и время доставки букета', null=True, blank=True)

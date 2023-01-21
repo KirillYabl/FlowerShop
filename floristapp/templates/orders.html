@@ -1,0 +1,32 @@
+{% extends 'florist-base.html' %}
+{% load static %}
+{% block title %}Необработанные заказы{% endblock title %}
+{% block content %}
+  <div class="container">
+   <table class="table table-responsive">
+    <tr>
+      <th>ID заказа</th>
+      <th>Статус</th>
+      <th>Стоимость</th>
+      <th>Клиент</th>
+      <th>Телефон</th>
+      <th>Адрес доставки</th>                
+      <th>Комментарий</th>
+      <th>Ссылка на админку</th>
+    </tr>
+
+    {% for order in orders %}
+      <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.status }}</td>
+        <td>{{ order.price }} руб.</td>
+        <td>{{ order.client_name }}</td>
+        <td>{{ order.phone }}</td>
+        <td>{{ order.delivery_address }}</td>
+        <td>{{ order.comment }}</td>               
+        <td><a href="{% url 'admin:flowerapp_order_change' order.id|urlencode %}?next={{ request.path|urlencode }}">Редактировать</a></td>
+      </tr>
+    {% endfor %}
+   </table>
+  </div>
+{% endblock %}

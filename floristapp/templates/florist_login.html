@@ -1,0 +1,40 @@
+{% extends 'florist-base.html' %}
+{% load static %}
+{% block top_menu %}
+  <header id="header">
+    <div class="container">
+      <div class="header ficb">
+        <img src="{% static 'img/logo.svg' %}" alt="logo" class="logo">
+      </div>
+    </div>
+  </header>
+{% endblock top_menu %}
+{% block header %}{% endblock header %}
+{% block title %}{% endblock title %}
+{% block content %}
+  <div class="container text-center">
+    <h2 style="margin-top: 60px; color: #17CF97;">Авторизация флориста</h2>
+
+    <hr/>
+
+    <div class="row">
+      <div class="col-sm-offset-4 col-sm-4">
+        <form method="post">
+          {% csrf_token %}
+
+          {{ form.non_field_errors }}
+
+          {% if ivalid %}
+            <div class="alert alert-danger" role="alert">Неверный логин / пароль.</div>
+          {% endif %}
+
+          <input type="hidden" name="next" value="{{ request.GET.next }}"/>
+
+          {{form.as_p}}
+          <button class="btn default-btn" type="submit">Войти</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+{% endblock %}

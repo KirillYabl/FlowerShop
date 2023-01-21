@@ -18,6 +18,7 @@
   <div class="container">
     <div class="header ficb">
       <a href="{% url 'index' %}"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
+      {% block top-menu %}
       <nav>
         <ul class="menu ficc">
           {% if not request.user.is_anonymous %}
@@ -28,6 +29,7 @@
           <li class="menu__item"><a href="{% url 'index' %}#contacts" class="menu__item_link">Контакты</a></li>
         </ul>
       </nav>
+      {% endblock top-menu %}
     </div>
   </div>
 </header>

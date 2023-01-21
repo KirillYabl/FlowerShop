@@ -1,9 +1,14 @@
-from django.templatetags.static import static
 from django.contrib import admin
 from django.shortcuts import reverse
+from django.templatetags.static import static
 from django.utils.html import format_html
 
 from . import models as m
+
+
+class FlowerShopCatalogItemInline(admin.TabularInline):
+    model = m.FlowerShopCatalogItem
+    extra = 0
 
 
 @admin.register(m.Event)
@@ -18,6 +23,7 @@ class FlowerShopAdmin(admin.ModelAdmin):
     list_display = ['address']
     list_display_links = ['address']
     search_fields = ['address']
+    inlines = [FlowerShopCatalogItemInline]
 
 
 @admin.register(m.DeliveryWindow)
@@ -54,6 +60,7 @@ class BouquetAdmin(admin.ModelAdmin):
     list_display_links = ['name', 'price', 'height_cm', 'width_cm']
     search_fields = ['name', 'description', 'price']
     list_filter = ['price', 'height_cm', 'width_cm', 'events']
+    inlines = [FlowerShopCatalogItemInline]
 
     readonly_fields = [
         'get_image_preview',
