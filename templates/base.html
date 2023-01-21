@@ -15,6 +15,7 @@
         <div class="container">
           <div class="header ficb">
             <a href="{% url 'index' %}"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
+            {% block top-menu %}
             <nav>
               <ul class="menu ficc">
                 <li class="menu__item"><a href="{% url 'catalog' %}" class="menu__item_link">Каталог</a></li>
@@ -22,13 +23,16 @@
                 <li class="menu__item"><a href="{% url 'index' %}#contacts" class="menu__item_link">Контакты</a></li>
               </ul>
             </nav>
+            {% endblock top-menu %}
           </div>
         </div>
       </header>
+      {% block success-alert %}
       <div class="success-alert" style="display: {{ success_alert_style }}">
         <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
         <strong>Успешно!</strong> Менеджер перезвонит вам в течение часа для консультации
       </div>
+      {% endblock success-alert %}
       {% block banner %}{% endblock banner %}
     {% block div-end %}{% endblock div-end %}
     {% block first-section %}{% endblock first-section %}

@@ -55,6 +55,11 @@ def consultation(request: WSGIRequest) -> HttpResponse:
     return render(request, 'consultation.html', context)
 
 
+def florist(request: WSGIRequest) -> HttpResponse:
+    context = {}
+    return render(request, 'florist.html', context)
+
+
 def order(request: WSGIRequest) -> HttpResponse:
     context = {}
     return render(request, 'order.html', context)
