@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models.functions import TruncDate
 from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -8,7 +9,7 @@ User = get_user_model()
 
 
 class Event(models.Model):
-    name = models.CharField('название', max_length=200)
+    name = models.CharField('название', max_length=200, unique=True)
 
     class Meta:
         verbose_name = 'событие для букета'
@@ -19,7 +20,7 @@ class Event(models.Model):
 
 
 class Bouquet(models.Model):
-    name = models.CharField('название', max_length=100)
+    name = models.CharField('название', max_length=100, unique=True)
     description = models.TextField('описание')
     photo = models.ImageField('фото')
     price = models.DecimalField('цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
@@ -45,7 +46,7 @@ class Bouquet(models.Model):
 
 
 class BouquetItem(models.Model):
-    name = models.CharField('название', max_length=200)
+    name = models.CharField('название', max_length=200, unique=True)
     bouquets = models.ManyToManyField(Bouquet, through='BouquetItemsInBouquet')
 
     class Meta:
@@ -64,13 +65,14 @@ class BouquetItemsInBouquet(models.Model):
     class Meta:
         verbose_name = 'элемент букета в букете'
         verbose_name_plural = 'элементы букета в букете'
+        unique_together = [['bouquet', 'item']]
 
     def __str__(self):
         return f'{self.item} в {self.bouquet} ({self.count} шт.)'
 
 
 class FlowerShop(models.Model):
-    address = models.CharField('адрес', max_length=200)
+    address = models.CharField('адрес', max_length=200, unique=True)
     phone = PhoneNumberField('контактный номер', region='RU', blank=True)  # TODO: migration for remove blank
 
     class Meta:
@@ -82,7 +84,7 @@ class FlowerShop(models.Model):
 
 
 class DeliveryWindow(models.Model):
-    name = models.CharField('название', max_length=200)
+    name = models.CharField('название', max_length=200, unique=True)
     from_hour = models.PositiveSmallIntegerField(
         'доставить с',
         validators=[MinValueValidator(0), MaxValueValidator(23)],
@@ -99,6 +101,7 @@ class DeliveryWindow(models.Model):
     class Meta:
         verbose_name = 'окно доставки'
         verbose_name_plural = 'окна доставки'
+        unique_together = [['from_hour', 'to_hour']]
 
     def __str__(self):
         return self.name
@@ -133,13 +136,20 @@ class Order(models.Model):
     created_at = models.DateTimeField('дата и время создания заказа', default=timezone.now)
     composed_at = models.DateTimeField('дата и время сбора букета флористом', null=True, blank=True)
     delivered_at = models.DateTimeField('дата и время доставки букета', null=True, blank=True)
-    status = models.CharField('статус заказа', max_length=15, choices=Status.choices, default=Status.created)
+    status = models.CharField(
+        'статус заказа',
+        max_length=15,
+        choices=Status.choices,
+        default=Status.created,
+        db_index=True
+    )
     florist = models.ForeignKey(User, related_name='f_orders', on_delete=models.DO_NOTHING, null=True, blank=True)
     courier = models.ForeignKey(User, related_name='c_orders', on_delete=models.DO_NOTHING, null=True, blank=True)
 
     class Meta:
         verbose_name = 'заказ'
         verbose_name_plural = 'заказы'
+        indexes = [models.Index(TruncDate("created_at"), "created_at", name="order_created_at_date_idx")]
 
     def __str__(self):
         return f'Заказ {self.pk} ({self.created_at}), {self.bouquet} по адресу {self.delivery_address}'
@@ -159,7 +169,8 @@ class Consultation(models.Model):
         'статус консультации',
         max_length=30,
         choices=Status.choices,
-        default=Status.created
+        default=Status.created,
+        db_index=True
     )
     event = models.CharField('повод', max_length=100, blank=True)
     budget = models.CharField('бюджет', max_length=100, blank=True)
@@ -167,6 +178,7 @@ class Consultation(models.Model):
     class Meta:
         verbose_name = 'консультация'
         verbose_name_plural = 'консультации'
+        indexes = [models.Index(TruncDate("created_at"), "created_at", name="cons_created_at_date_idx")]
 
     def __str__(self):
         return f'Консультация {self.pk} ({self.created_at}), {self.phone} ({self.client_name})'
