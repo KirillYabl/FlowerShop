@@ -22,6 +22,7 @@
       <nav>
         <ul class="menu ficc">
           {% if not request.user.is_anonymous %}
+          <li class="menu__item"><a href="{% url 'floristapp:orders' %}" class="menu__item_link">К заказам</a></li>
           <li class="menu__item"><a href="{% url 'stats' %}" class="menu__item_link">Дашборд</a></li>
           {% endif %}
           <li class="menu__item"><a href="{% url 'catalog' %}" class="menu__item_link">Каталог</a></li>
@@ -111,6 +112,7 @@
       <nav>
         <ul class="menu footer__menu ficc">
           {% if not request.user.is_anonymous %}
+          <li class="menu__item"><a href="{% url 'floristapp:orders' %}" class="menu__item_link">К заказам</a></li>
           <li class="menu__item"><a href="{% url 'stats' %}" class="menu__item_link">Дашборд</a></li>
           {% endif %}
           <li class="menu__item"><a href="{% url 'catalog' %}" class="menu__item_link">Каталог</a></li>
