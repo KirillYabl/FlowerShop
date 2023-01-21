@@ -21,13 +21,13 @@
       {% block top-menu %}
       <nav>
         <ul class="menu ficc">
+          <li class="menu__item"><a href="{% url 'catalog' %}" class="menu__item_link">Каталог</a></li>
+          <li class="menu__item"><a href="{% url 'quiz' %}" class="menu__item_link">Рекомендации</a></li>
+          <li class="menu__item"><a href="{% url 'index' %}#contacts" class="menu__item_link">Контакты</a></li>
           {% if not request.user.is_anonymous %}
           <li class="menu__item"><a href="{% url 'floristapp:orders' %}" class="menu__item_link">К заказам</a></li>
           <li class="menu__item"><a href="{% url 'stats' %}" class="menu__item_link">Дашборд</a></li>
           {% endif %}
-          <li class="menu__item"><a href="{% url 'catalog' %}" class="menu__item_link">Каталог</a></li>
-          <li class="menu__item"><a href="{% url 'quiz' %}" class="menu__item_link">Рекомендации</a></li>
-          <li class="menu__item"><a href="{% url 'index' %}#contacts" class="menu__item_link">Контакты</a></li>
         </ul>
       </nav>
       {% endblock top-menu %}
@@ -111,13 +111,13 @@
       <a href="{% url 'index' %}"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo footer__logo"></a>
       <nav>
         <ul class="menu footer__menu ficc">
+          <li class="menu__item"><a href="{% url 'catalog' %}" class="menu__item_link">Каталог</a></li>
+          <li class="menu__item"><a href="{% url 'quiz' %}" class="menu__item_link">Рекомендации</a></li>
+          <li class="menu__item"><a href="{% url 'index' %}#contacts" class="menu__item_link">Контакты</a></li>
           {% if not request.user.is_anonymous %}
           <li class="menu__item"><a href="{% url 'floristapp:orders' %}" class="menu__item_link">К заказам</a></li>
           <li class="menu__item"><a href="{% url 'stats' %}" class="menu__item_link">Дашборд</a></li>
           {% endif %}
-          <li class="menu__item"><a href="{% url 'catalog' %}" class="menu__item_link">Каталог</a></li>
-          <li class="menu__item"><a href="{% url 'quiz' %}" class="menu__item_link">Рекомендации</a></li>
-          <li class="menu__item"><a href="{% url 'index' %}#contacts" class="menu__item_link">Контакты</a></li>
         </ul>
       </nav>
       <hr class="line"></hr>
