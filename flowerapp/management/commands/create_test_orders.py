@@ -36,6 +36,10 @@ class Command(BaseCommand):
         delivery_windows = list(DeliveryWindow.objects.all())
         bouquets = list(Bouquet.objects.all())
 
+        Order.objects.filter(delivery_address__contains='delivery_address_').delete()
+        User.objects.filter(username__contains='florist_').delete()
+        User.objects.filter(username__contains='courier_').delete()
+
         for i in range(5):
             user = User(username=f'florist_{i}', password=f'Passw0rd_{i}_!£3', role=User.Role.florist)
             user.save()
@@ -63,7 +67,7 @@ class Command(BaseCommand):
         work_etime = time(hour=21, minute=0)
 
         for day_delta in range(-four_years_ago, 0):
-            day = today + timezone.timedelta(days=day_delta)
+            day = today + timedelta(days=day_delta)
             day_orders_count = random.randint(5, 40)
             orders = []
             for _ in range(day_orders_count):
@@ -71,12 +75,16 @@ class Command(BaseCommand):
                 order_datetime = datetime.combine(day, order_time)
 
                 compose_minutes = random.randint(30, 120)
-                compose_datetime = datetime.combine(day, work_stime)
-                if (datetime.combine(day, work_etime) - order_datetime).seconds > compose_minutes * 60:
-                    compose_datetime = datetime.combine(day + timedelta(days=1), work_stime)
+                compose_datetime = datetime.combine(day, order_time) + timedelta(minutes=compose_minutes)
+                if (datetime.combine(day, work_etime) - order_datetime).seconds < compose_minutes * 60:
+                    compose_datetime = datetime.combine(day + timedelta(days=1), work_stime) + timedelta(minutes=compose_minutes)
 
                 delivery_minutes = random.randint(30, 120)
-                delivery_datetime = compose_datetime + timezone.timedelta(minutes=delivery_minutes)
+                delivery_datetime = compose_datetime + timedelta(minutes=delivery_minutes)
+
+                delivery_datetime = delivery_datetime.replace(tzinfo=timezone.get_current_timezone())
+                compose_datetime = compose_datetime.replace(tzinfo=timezone.get_current_timezone())
+                order_datetime = order_datetime.replace(tzinfo=timezone.get_current_timezone())
 
                 client = random.choice(clients)
 
