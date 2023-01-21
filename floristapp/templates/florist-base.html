@@ -20,7 +20,7 @@
               <ul class="menu ficc">
                 <li class="menu__item"><a href="{% url 'floristapp:availability' %}" class="menu__item_link">Наличие</a></li>
                 <li class="menu__item"><a href="{% url 'floristapp:orders' %}" class="menu__item_link">Заказы</a></li>
-                <li class="menu__item"><a href="{% url 'floristapp:logout' %}" class="menu__item_link">Выйти</a></li>
+                <li class="menu__item"><a href="{% url 'logout' %}" class="menu__item_link">Выйти</a></li>
               </ul>
             </nav>
           </div>
@@ -31,7 +31,7 @@
     {% block header %}
       <br/>
       <center>
-        <h3 style="font-family: 'Roboto', sans-serif;">{% block title %}{% endblock title %}</h2>
+        <h3 style="font-family: 'Roboto', sans-serif;">{% block title %}{% endblock title %}</h3>
       </center>
       <br/>
       <br/>

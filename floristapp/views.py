@@ -68,7 +68,7 @@ def is_florist(user):
     return user.is_staff  # FIXME replace with specific permission
 
 
-@user_passes_test(is_florist, login_url='floristapp:login')
+@user_passes_test(is_florist, login_url='login')
 def view_availability(request):
     flower_shops = FlowerShop.objects.order_by('address')
     shops_addresses = [
@@ -90,7 +90,7 @@ def view_availability(request):
     return render(request, template_name='bouquets-availability.html', context=context)
 
 
-@user_passes_test(is_florist, login_url='floristapp:login')
+@user_passes_test(is_florist, login_url='login')
 def view_orders(request):
     orders = (
         Order.objects

@@ -28,6 +28,11 @@
           <li class="menu__item"><a href="{% url 'floristapp:orders' %}" class="menu__item_link">К заказам</a></li>
           <li class="menu__item"><a href="{% url 'stats' %}" class="menu__item_link">Дашборд</a></li>
           {% endif %}
+          {% if not request.user.is_anonymous %}
+          <li class="menu__item"><a href="{% url 'logout' %}" class="menu__item_link">Выйти</a></li>
+          {% else %}
+          <li class="menu__item"><a href="{% url 'login' %}" class="menu__item_link">Войти</a></li>
+          {% endif %}
         </ul>
       </nav>
       {% endblock top-menu %}
@@ -65,10 +70,6 @@
 </section>
 {% endblock contacts %}
 {% block consultation %}
-<!--<div class="success-alert" style="display: {{ success_alert_style|default:'none' }}">-->
-<!--  <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>-->
-<!--  <strong>Успешно!</strong> Менеджер перезвонит вам в течение 20 минут для консультации-->
-<!--</div>-->
 <div id="success-alert" class="success-alert" style="display: {{ success_alert_style|default:'none' }}">
   <div class="success-alert-content">
     <div class="success-alert-header">
@@ -117,6 +118,11 @@
           {% if not request.user.is_anonymous %}
           <li class="menu__item"><a href="{% url 'floristapp:orders' %}" class="menu__item_link">К заказам</a></li>
           <li class="menu__item"><a href="{% url 'stats' %}" class="menu__item_link">Дашборд</a></li>
+          {% endif %}
+          {% if not request.user.is_anonymous %}
+          <li class="menu__item"><a href="{% url 'logout' %}" class="menu__item_link">Выйти</a></li>
+          {% else %}
+          <li class="menu__item"><a href="{% url 'login' %}" class="menu__item_link">Войти</a></li>
           {% endif %}
         </ul>
       </nav>
