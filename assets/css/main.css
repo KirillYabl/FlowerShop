@@ -252,7 +252,7 @@ input::placeholder {
 	border-radius: 5px;
 	font-size: 16px;
 	line-height: 103.52%;
-	color: rgba(0, 0, 0, .3);
+	color: rgba(0, 0, 0);
 	margin-right: 10px;
 }
 .consultation__form_btn {
@@ -392,7 +392,7 @@ input::placeholder {
 	color: #ABABAB;
 }
 .quiz__back {
-	padding-top: 210px;
+	padding-top: 120px;
 }
 .quiz__title {
 	margin-top: 20px;
@@ -403,6 +403,9 @@ input::placeholder {
 	font-size: 36px;
 	line-height: 103.52%;
 	color: #2D2D2D;
+}
+.quiz__elems_sec {
+    margin-top: 10px;
 }
 .quiz__elem {
 	font-weight: 500;
@@ -454,6 +457,31 @@ input::placeholder {
 	border-radius: 10px;
 	width: 8px;
 	height: 8px;
+}
+
+.quiz__progress_lineActive2 {;
+	position: absolute;
+	background: #17CF97;
+	border-radius: 10px;
+	width: 50%;
+	height: 8px;
+}
+
+.quiz__form_input {
+	width: 240px;
+	height: 57px;
+
+	background: #F4F4F4;
+	border-radius: 5px;
+	padding-left: 30px;
+	padding-right: 15px;
+	border: none;
+	font-size: 16px;
+line-height: 103.52%;
+/* identical to box height, or 17px */
+/*	margin-right: 10px;*/
+	outline: none;
+color: rgba(0, 0, 0);
 }
 
 /*result.html*/
@@ -704,8 +732,150 @@ input[type=radio]:checked + label {
     color: #2D2D2D;
     opacity: 0.3;
 }
+.singUpConsultation__form_input {
+	width: 240px;
+	height: 57px;
+
+	background: #F4F4F4;
+	border-radius: 5px;
+	padding-left: 30px;
+	padding-right: 15px;
+	border: none;
+	font-size: 16px;
+line-height: 103.52%;
+/* identical to box height, or 17px */
+/*	margin-right: 10px;*/
+	outline: none;
+color: rgba(0, 0, 0);
+}
+
+/* Алерт */
+/*
+.success-alert {
+  padding: 20px;
+  background-color: #04AA6D;
+  color: white;
+}
+
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.closebtn:hover {
+  color: black;
+}
+*/
+
+.success-alert {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: #04AA6D; /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.success-alert-content {
+  background-color: #04AA6D;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%; /* Could be more or less, depending on screen size */
+}
+
+.success-alert-header {
+  padding: 2px 16px;
+  background-color: #04AA6D;
+  color: white;
+}
+
+.success-alert-body {
+  padding: 2px 16px;
+  color: white;
+}
+
+.closebtn {
+  color: white;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.closebtn:hover,
+.closebtn:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Login.html */
+#login {
+	padding-top: 37px;
+	padding-bottom: 49px;
+	background: #17CF97;
+}
+.login__title {
+	line-height: 103.52%;
+/* or 37px */
+margin-bottom: 19px;
+	text-align: center;
+color: #FFFFFF;
+}
+.login__form {
+	width: 655px;
+	margin: 0 auto;
+}
+.login__form_input {
+	padding-left: 30px;
+	padding-right: 7px;
+
+	width: 240px;
+	height: 57px;
+	border: none;
+	outline: none;
+	background: #FFFFFF;
+	border-radius: 5px;
+	font-size: 16px;
+	line-height: 103.52%;
+	color: rgba(0, 0, 0, .3);
+	margin-right: 10px;
+}
+.login__form_btn {
+	font-weight: 500;
+	font-size: 16px;
+	line-height: 103.52%;
+	/* identical to box height, or 17px */
+
+
+	color: #FFFFFF;
+	width: 141px;
+	height: 57px;
+	background: transparent;
+	border: 1px solid #FFFFFF;
+	border-radius: 40px;
+	cursor: pointer;
+}
+
+/* stats items */
+.stats__items {
+	width: 45%;
+	border: 1px solid #17CF97;
+	text-align: center;
+	padding: 19px 28px;
+}
 
 /*availability.html*/
 .default-btn {
-	padding: 10px;
+    padding: 10px;
 }

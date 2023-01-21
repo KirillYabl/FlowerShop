@@ -22,7 +22,6 @@ class LoginView(View):
             password = form.cleaned_data['password']
 
             user = authenticate(request, username=username, password=password)
-            print(username, password, user)
             if user:
                 login(request, user)
                 if user.is_staff:  # FIXME replace with specific permission

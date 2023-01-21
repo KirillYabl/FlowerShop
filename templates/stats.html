@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% load static %}
+{% load format_thousands %}
+{% block first-section %}
+<section id="result">
+  <div class="container">
+    <div class="result p100">
+      <div class="title">Дашборд</div>
+      <div class="result__block ficb">
+        <div>
+          <form action="" class="consultation__form">
+            <select style="margin-right: 7px" name="period" class="quiz__form_input" id="period">
+              <option value="all">За все время</option>
+              <option value="today">Сегодня</option>
+              <option value="week">За неделю</option>
+              <option value="month">За месяц</option>
+              <option value="year">За год</option>
+              <option value="this_month">Этот месяц</option>
+              <option value="this_year">Этот год</option>
+              <option value="previous_month">Прошлый месяц</option>
+              <option value="previous_year">Прошлый год</option>
+            </select>
+            <select style="margin-right: 7px" name="bouquet" class="quiz__form_input" id="bouquet">
+              <option value="any">Любой</option>
+              {% for bouquet in bouquets %}
+              <option value="{{ bouquet.id }}">{{ bouquet.name }}</option>
+              {% endfor %}
+            </select>
+            <button type="submit" class="quiz__elem">Отправить</button>
+          </form>
+        </div>
+      </div>
+      <br>
+      <div class="result__block ficb">
+        <div class="stats__items">
+          <canvas id="dayHourDistribution"></canvas>
+        </div>
+        <div class="stats__items">
+          <canvas id="ordersDistribution"></canvas>
+        </div>
+      </div>
+      <br>
+      <div class="result__block ficb">
+        <div class="stats__items">
+          <div class="title result__items_title">Данные по клиентам</div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Сумма оплат:</div>
+            {{ orders_sum|floatformat:'0'|format_thousands }} руб
+          </div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Заказанных букетов:</div>
+            {{ orders_count|format_thousands }}
+          </div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Уникальных клиентов:</div>
+            {{ unique_clients_count|format_thousands }}
+          </div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Оказанных консультаций:</div>
+            {{ consultations_count|format_thousands }}
+          </div>
+        </div>
+        <div class="stats__items">
+          <div class="title result__items_title">Данные по заказам</div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Среднее время от заказа до доставки:</div>
+            {{ order_to_delivery_avg_time.hours }} ч. {{ order_to_delivery_avg_time.minutes60 }} мин.
+          </div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Среднее время от заказа до сбора:</div>
+            {{ order_to_compose_avg_time.hours }} ч. {{ order_to_compose_avg_time.minutes60 }} мин.
+          </div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Среднее время от сбора до доставки:</div>
+            {{ compose_to_delivery_avg_time.hours }} ч. {{ compose_to_delivery_avg_time.minutes60 }} мин.
+          </div>
+          <hr class="result__items_line"/>
+          <div class="result__items_price">
+            <div class="result__items_intro">Самое популярное окно доставки:</div>
+            {{ most_popular_window }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const dhd = document.getElementById('dayHourDistribution');
+
+  new Chart(dhd, {
+    type: 'line',
+    data: {
+      datasets: [{
+        label: '% заказов от всех в данный час',
+        data: {
+          {% for item in by_hours_distribution %}
+          {{ item.hour }}: {{ item.percent }},
+          {% endfor %}
+        },
+        borderWidth: 1,
+        borderColor: '#17CF97',
+        backgroundColor: '#17CF97',
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: 'Распределение времени заказов по часам'
+        }
+      }
+    }
+  });
+
+  const od = document.getElementById('ordersDistribution');
+
+  new Chart(od, {
+    type: 'bar',
+    data: {
+      datasets: [{
+        label: 'Количество заказов в данный промежуток времени',
+        data: {
+          {% for item in by_time_distribution %}
+          "{{ item.t }}": {{ item.num }},
+          {% endfor %}
+        },
+        borderWidth: 1,
+        borderColor: '#17CF97',
+        backgroundColor: '#17CF97',
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: 'Распределение заказов по времени'
+        }
+      }
+    }
+  });
+
+
+</script>
+{% endblock first-section %}
+{% block contacts %}{% endblock contacts %}
+{% block consultation %}{% endblock consultation %}
