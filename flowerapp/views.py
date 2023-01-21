@@ -1,7 +1,9 @@
+import datetime
 from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
 from django.core.handlers.wsgi import WSGIRequest
+from django.db import models
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -11,12 +13,14 @@ from .forms import ConsultationForm
 from .forms import CustomEventForm
 from .forms import OrderForm
 from .models import Bouquet
+from .models import BouquetItemsInBouquet
 from .models import Consultation
+from .models import DeliveryWindow
 from .models import Event
 from .models import FlowerShop
-from .models import BouquetItemsInBouquet
+from .models import Order
 
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Sum, Count, F, Case, When, Value, Avg
 from environs import Env
 
 
@@ -115,7 +119,7 @@ def order(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
     link_pay = env.str('LINK_PAY')
 
     form = OrderForm()
-    
+
     selected_bouquet = Bouquet.objects.get(id=bouquet_id)
     price_order = float(selected_bouquet.price)
     link_order = f'{link_pay}{price_order}'
@@ -219,5 +223,66 @@ def result(request: WSGIRequest) -> HttpResponse:
 
 @login_required
 def stats(request: WSGIRequest) -> HttpResponse:
-    context = {}
+    orders = Order.objects.exclude(status=Order.Status.cancelled)
+    delivery_window_id = orders.values('delivery_window').annotate(
+        num=Count('delivery_window')).order_by('-num')[0]['delivery_window']
+
+    records = orders.annotate(
+        delivered_date=F('delivered_at__date'),
+        composed_date=F('composed_at__date'),
+        created_date=F('created_at__date'),
+        delivered_time=F('delivered_at__time'),
+        composed_time=F('composed_at__time'),
+    )
+
+    orders_dt_aggregated = orders.annotate(
+        delivered_date=F('delivered_at__date'),
+        composed_date=F('composed_at__date'),
+        created_date=F('created_at__date'),
+        delivered_time=F('delivered_at__time'),
+        composed_time=F('composed_at__time'),
+    ).annotate(
+        order_to_delivery_time=Case(
+            When(delivered_date=F('created_date'), then=F('delivered_at') - F('created_at')),
+            When(delivered_date__gt=F('created_date'),
+                 then=F('delivered_time') - datetime.time(8, 0, tzinfo=timezone.get_current_timezone())),
+        ),
+        order_to_compose_time=Case(
+            When(composed_date=F('created_date'), then=F('composed_at') - F('created_at')),
+            When(composed_date__gt=F('created_date'),
+                 then=F('composed_time') - datetime.time(8, 0, tzinfo=timezone.get_current_timezone())),
+        ),
+        compose_to_delivery_time=Case(
+            When(delivered_date=F('composed_date'), then=F('delivered_at') - F('composed_at')),
+            When(delivered_date__gt=F('composed_date'),
+                 then=F('delivered_time') - datetime.time(8, 0, tzinfo=timezone.get_current_timezone())),
+        ),
+    ).aggregate(
+        order_to_delivery_avg_time=Avg('order_to_delivery_time'),
+        order_to_compose_avg_time=Avg('order_to_compose_time'),
+        compose_to_delivery_avg_time=Avg('compose_to_delivery_time'),
+    )
+
+    class TimedeltaWrapper:
+        def __init__(self, td: datetime.timedelta):
+            self.td = td
+
+        @property
+        def hours(self):
+            return self.td.seconds // 3600
+
+        @property
+        def minutes60(self):
+            return (self.td.seconds // 60) % 60
+
+    context = {
+        'orders_sum': orders.aggregate(orders_sum=Sum('price'))['orders_sum'],
+        'orders_count': orders.count(),
+        'unique_clients_count': orders.values_list('phone', flat=True).distinct().count(),
+        'consultations_count': Consultation.objects.count(),
+        'order_to_delivery_avg_time': TimedeltaWrapper(orders_dt_aggregated['order_to_delivery_avg_time']),
+        'order_to_compose_avg_time': TimedeltaWrapper(orders_dt_aggregated['order_to_compose_avg_time']),
+        'compose_to_delivery_avg_time': TimedeltaWrapper(orders_dt_aggregated['compose_to_delivery_avg_time']),
+        'most_popular_window': DeliveryWindow.objects.get(id=delivery_window_id).name
+    }
     return render(request, 'stats.html', context)

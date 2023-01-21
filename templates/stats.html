@@ -10,6 +10,7 @@
         <div>
           <form action="#consultation" class="consultation__form">
             <select name="period" class="quiz__form_input" id="period">
+              <option value="today">За все время</option>
               <option value="today">Сегодня</option>
               <option value="week">Последняя неделя</option>
             </select>
@@ -37,22 +38,22 @@
           <hr class="result__items_line"/>
           <div class="result__items_price">
             <div class="result__items_intro">Сумма оплат:</div>
-            29 000 руб
+            {{ orders_sum|floatformat:'0'|format_thousands }} руб
           </div>
           <hr class="result__items_line"/>
           <div class="result__items_price">
             <div class="result__items_intro">Заказанных букетов:</div>
-            12
+            {{ orders_count|format_thousands }}
           </div>
           <hr class="result__items_line"/>
           <div class="result__items_price">
             <div class="result__items_intro">Уникальных клиентов:</div>
-            9
+            {{ unique_clients_count|format_thousands }}
           </div>
           <hr class="result__items_line"/>
           <div class="result__items_price">
             <div class="result__items_intro">Оказанных консультаций:</div>
-            35
+            {{ consultations_count|format_thousands }}
           </div>
         </div>
         <div class="stats__items">
@@ -60,22 +61,22 @@
           <hr class="result__items_line"/>
           <div class="result__items_price">
             <div class="result__items_intro">Среднее время от заказа до доставки:</div>
-            3 ч. 18 мин.
+            {{ order_to_delivery_avg_time.hours }} ч. {{ order_to_delivery_avg_time.minutes60 }} мин.
           </div>
           <hr class="result__items_line"/>
           <div class="result__items_price">
             <div class="result__items_intro">Среднее время от заказа до сбора:</div>
-            1 ч. 58 мин.
+            {{ order_to_compose_avg_time.hours }} ч. {{ order_to_compose_avg_time.minutes60 }} мин.
           </div>
           <hr class="result__items_line"/>
           <div class="result__items_price">
             <div class="result__items_intro">Среднее время от сбора до доставки:</div>
-            1 ч. 20 мин.
+            {{ compose_to_delivery_avg_time.hours }} ч. {{ compose_to_delivery_avg_time.minutes60 }} мин.
           </div>
           <hr class="result__items_line"/>
           <div class="result__items_price">
             <div class="result__items_intro">Самое популярное окно доставки:</div>
-            с 16:00 до 18:00
+            {{ most_popular_window }}
           </div>
         </div>
       </div>
