@@ -80,17 +80,29 @@ class OrderForm(forms.Form):
                                 'name': 'fname',
                                 'class': 'order__form_input',
                                 'placeholder': 'Введите Имя'
-                            }))
+                            }),
+                            error_messages={
+                                'required': 'Поле "Имя" не должно быть пустым'
+                            })
     phone = PhoneNumberField(region='RU', label='',
                              widget=RegionalPhoneNumberWidget(attrs={
                                 'name': 'tel',
                                 'class': 'order__form_input',
                                 'placeholder': '+ 7(999) 000 00 00'
-                            }))
+                            }),
+                            error_messages={
+                                'invalid': 'Поле "Телефон" должно быть в формате + 7(999) 000-00-00'
+                            })
     delivery_address = forms.CharField(max_length=200, label='', 
                             widget=forms.TextInput(attrs={
                                 'name': 'adres',
                                 'class': 'order__form_input',
                                 'placeholder': 'Адрес доставки'
-                            }))
-    delivery_window = forms.ChoiceField(widget=forms.RadioSelect(attrs={'class': 'order__form_radio'}), choices=CHOICES)
+                            }),
+                            error_messages={
+                                'required': 'Поле "Адрес" не должно быть пустым'
+                            })
+    delivery_window = forms.ChoiceField(widget=forms.RadioSelect(attrs={'class': 'order__form_radio'}), choices=CHOICES,
+                            error_messages={
+                                'required': 'Необходимо выбрать окно для доставки'
+                            })
