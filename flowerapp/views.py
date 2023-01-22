@@ -84,8 +84,10 @@ def card(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
 def catalog(request: WSGIRequest) -> HttpResponse:
     success_alert_style = request.COOKIES.get('success_alert_style', 'none')
     bouquets = Bouquet.objects.all()
+    count_items = len(bouquets)
     context = {
         'bouquets': bouquets,
+        'count_items': count_items,
         'success_alert_style': success_alert_style,
         'form': ConsultationForm(class_name='consultation__form_input'),
     }
