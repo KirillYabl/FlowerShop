@@ -10,13 +10,19 @@
 						<div class="title">Оформление доставки</div>
 						<form action="{% url 'order' bouquet.id %}" method="post" class="order__form">
 							{% csrf_token %}
+							{% if form.errors %}
+							<ul>
+							{% for field in form %}
+							{% for error in field.errors %}
+							<li style="color: #000000"><strong>{{ error|escape }}</strong></li>
+							{% endfor %}
+							{% endfor %}
+							</ul>
+							{% endif %}
 							<div class="order__form_block ficb">
 								{{form.client_name}}
-								<span>{{form.client_name.errors}}</span>
 								{{form.phone}}
-								<span>{{form.phone.errors}}</span>
 								{{form.delivery_address}}
-								<span>{{form.delivery_address.errors}}</span>
 							</div>
 							<div class="order__form_btns fic">
 								{% for radio in form.delivery_window %}

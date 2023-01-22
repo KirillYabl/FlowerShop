@@ -125,18 +125,18 @@ def order(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
     price_order = float(selected_bouquet.price)
     link_order = f'{link_pay}{price_order}'
 
-    form = OrderForm()
+    # form = OrderForm()
 
     context = {
         'link_order': link_order,
         'bouquet': selected_bouquet,
-        'form': form,
+        'form': OrderForm(),
     }
 
     if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            cleaned_inputs = form.cleaned_data
+        context['form'] = OrderForm(request.POST)
+        if context['form'].is_valid():
+            cleaned_inputs = context['form'].cleaned_data
             delivery_window = DeliveryWindow.objects.get(id=int(cleaned_inputs['delivery_window']))
 
             new_order = Order.objects.create(
