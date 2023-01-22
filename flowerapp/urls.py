@@ -10,4 +10,5 @@ urlpatterns = [
     path('order/<bouquet_id>/', views.order, name='order'),
     path('quiz', views.quiz, name='quiz'),
     path('result', views.result, name='result'),
+    path('stats', views.stats, name='stats'),
 ]

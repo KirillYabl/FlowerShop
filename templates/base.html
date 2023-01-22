@@ -18,13 +18,24 @@
   <div class="container">
     <div class="header ficb">
       <a href="{% url 'index' %}"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
+      {% block top-menu %}
       <nav>
         <ul class="menu ficc">
           <li class="menu__item"><a href="{% url 'catalog' %}" class="menu__item_link">Каталог</a></li>
           <li class="menu__item"><a href="{% url 'quiz' %}" class="menu__item_link">Рекомендации</a></li>
           <li class="menu__item"><a href="{% url 'index' %}#contacts" class="menu__item_link">Контакты</a></li>
+          {% if not request.user.is_anonymous %}
+          <li class="menu__item"><a href="{% url 'floristapp:orders' %}" class="menu__item_link">К заказам</a></li>
+          <li class="menu__item"><a href="{% url 'stats' %}" class="menu__item_link">Дашборд</a></li>
+          {% endif %}
+          {% if not request.user.is_anonymous %}
+          <li class="menu__item"><a href="{% url 'logout' %}" class="menu__item_link">Выйти</a></li>
+          {% else %}
+          <li class="menu__item"><a href="{% url 'login' %}" class="menu__item_link">Войти</a></li>
+          {% endif %}
         </ul>
       </nav>
+      {% endblock top-menu %}
     </div>
   </div>
 </header>
@@ -59,9 +70,16 @@
 </section>
 {% endblock contacts %}
 {% block consultation %}
-<div class="success-alert" style="display: {{ success_alert_style|default:'none' }}">
-  <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-  <strong>Успешно!</strong> Менеджер перезвонит вам в течение 20 минут для консультации
+<div id="success-alert" class="success-alert" style="display: {{ success_alert_style|default:'none' }}">
+  <div class="success-alert-content">
+    <div class="success-alert-header">
+      <span class="closebtn" onclick="this.parentElement.parentElement.parentElement.style.display='none';">&times;</span>
+      <h2>Успешно!</h2>
+    </div>
+    <div class="success-alert-body">
+      <p>Менеджер перезвонит вам в течение 20 минут для консультации</p>
+    </div>
+  </div>
 </div>
 <section id="consultation">
   <div class="container">
@@ -97,6 +115,15 @@
           <li class="menu__item"><a href="{% url 'catalog' %}" class="menu__item_link">Каталог</a></li>
           <li class="menu__item"><a href="{% url 'quiz' %}" class="menu__item_link">Рекомендации</a></li>
           <li class="menu__item"><a href="{% url 'index' %}#contacts" class="menu__item_link">Контакты</a></li>
+          {% if not request.user.is_anonymous %}
+          <li class="menu__item"><a href="{% url 'floristapp:orders' %}" class="menu__item_link">К заказам</a></li>
+          <li class="menu__item"><a href="{% url 'stats' %}" class="menu__item_link">Дашборд</a></li>
+          {% endif %}
+          {% if not request.user.is_anonymous %}
+          <li class="menu__item"><a href="{% url 'logout' %}" class="menu__item_link">Выйти</a></li>
+          {% else %}
+          <li class="menu__item"><a href="{% url 'login' %}" class="menu__item_link">Войти</a></li>
+          {% endif %}
         </ul>
       </nav>
       <hr class="line"></hr>

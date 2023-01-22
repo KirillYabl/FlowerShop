@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'userapp',
     'flowerapp',
+    'floristapp',
 ]
 
 if DEBUG:

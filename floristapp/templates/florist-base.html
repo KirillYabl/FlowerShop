@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flower Shop Florist</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Unbounded:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+  </head>
+
+  <body>
+    {% block top_menu %}
+      <header id="header">
+        <div class="container">
+          <div class="header ficb">
+            <a href="{% url 'index' %}"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
+            <nav>
+              <ul class="menu ficc">
+                <li class="menu__item"><a href="{% url 'floristapp:availability' %}" class="menu__item_link">Наличие</a></li>
+                <li class="menu__item"><a href="{% url 'floristapp:orders' %}" class="menu__item_link">Заказы</a></li>
+                <li class="menu__item"><a href="{% url 'logout' %}" class="menu__item_link">Выйти</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </header>
+    {% endblock top_menu %}
+
+    {% block header %}
+      <br/>
+      <center>
+        <h3 style="font-family: 'Roboto', sans-serif;">{% block title %}{% endblock title %}</h3>
+      </center>
+      <br/>
+      <br/>
+    {% endblock header %}
+
+    {% block content %}{% endblock %}
+  </body>
+</html>

@@ -21,28 +21,10 @@
             <input type="hidden" name="custom" value="false"/>
           </form>
           {% endfor %}
-        </div>
-        <div class="quiz__elems_sec fic">
-          <form action="{% url 'quiz' %}" method="get">
-            {% for field in form %}
-            {{ field }}
-            {% endfor %}
-            <button class="quiz__elem" type="submit" name="custom" value="true">Другое</button>
-            {% if form.errors %}
-            <ul>
-              {% for field in form %}
-              {% for error in field.errors %}
-              <li>{{ error|escape }}</li>
-              {% endfor %}
-              {% endfor %}
-            </ul>
-            {% endif %}
+          <form action="{% url 'quiz' %}">
+            <button class="quiz__elem" name="event" value="other">Другое</button>
+            <input type="hidden" name="custom" value="true"/>
           </form>
-          <!--          <form action="{% url 'quiz' %}">-->
-          <!--            <input style="color: #000000" type="text" name="event" class="order__form_input"-->
-          <!--                   placeholder="Введите свой повод" required/>-->
-          <!--            <button class="quiz__elem" type="submit" name="custom" value="true">Другое</button>-->
-          <!--          </form>-->
         </div>
         <div class="quiz__progress">
           <div class="quiz__progress_step">
@@ -57,45 +39,56 @@
       </div>
       {% else %}
       <div class="quiz__block">
-        <h1 class="quiz__title">На какой бюджет рассчитываете?</h1>
-        <div class="quiz__elems fic">
-          <form action="{{ anchor }}">
-            <button class="quiz__elem" type="submit">До 1 000 руб</button>
-            <input type="hidden" name="price_from" value="0"/>
-            <input type="hidden" name="price_to" value="1000"/>
-            <input type="hidden" name="event" value="{{ event }}"/>
+        {% if custom %}
+        <h1 class="quiz__title">Укажите бюджет и введите данные для консультации</h1>
+        <div class="quiz__elems_sec fic">
+          <form action="{{ anchor }}" method="get">
+            <button class="quiz__elem" type="submit" name="price" value="0-1000">До 1 000 руб</button>
+            <button class="quiz__elem" type="submit" name="price" value="1000-5000">1 000 - 5 000 руб</button>
+            <button class="quiz__elem" type="submit" name="price" value="5000-999999999">от 5 000 руб</button>
+            <button class="quiz__elem" type="submit" name="price" value="0-999999999">Не имеет значения</button>
+            <br>
+            <br>
+            {% for field in form %}
+            {{ field }}
+            {% endfor %}
+            {% if form.errors %}
+            <ul>
+              {% for field in form %}
+              {% for error in field.errors %}
+              <li>{{ error|escape }}</li>
+              {% endfor %}
+              {% endfor %}
+            </ul>
+            {% endif %}
             <input type="hidden" name="custom" value="{{ custom }}"/>
-            <input type="hidden" name="client_name" value="{{ client_name }}"/>
-            <input type="hidden" name="phone" value="{{ phone }}"/>
-          </form>
-          <form action="{{ anchor }}">
-            <button class="quiz__elem">1 000 - 5 000 руб</button>
-            <input type="hidden" name="price_from" value="1000"/>
-            <input type="hidden" name="price_to" value="5000"/>
-            <input type="hidden" name="event" value="{{ event }}"/>
-            <input type="hidden" name="custom" value="{{ custom }}"/>
-            <input type="hidden" name="client_name" value="{{ client_name }}"/>
-            <input type="hidden" name="phone" value="{{ phone }}"/>
-          </form>
-          <form action="{{ anchor }}">
-            <button class="quiz__elem">от 5 000 руб</button>
-            <input type="hidden" name="price_from" value="5000"/>
-            <input type="hidden" name="price_to" value="999999999"/>
-            <input type="hidden" name="event" value="{{ event }}"/>
-            <input type="hidden" name="custom" value="{{ custom }}"/>
-            <input type="hidden" name="client_name" value="{{ client_name }}"/>
-            <input type="hidden" name="phone" value="{{ phone }}"/>
-          </form>
-          <form action="{{ anchor }}">
-            <button class="quiz__elem">Не имеет значения</button>
-            <input type="hidden" name="price_from" value="0"/>
-            <input type="hidden" name="price_to" value="999999999"/>
-            <input type="hidden" name="event" value="{{ event }}"/>
-            <input type="hidden" name="custom" value="{{ custom }}"/>
-            <input type="hidden" name="client_name" value="{{ client_name }}"/>
-            <input type="hidden" name="phone" value="{{ phone }}"/>
           </form>
         </div>
+        {% else %}
+        <h1 class="quiz__title">На какой бюджет рассчитываете?</h1>
+        <div class="quiz__elems fic">
+          <form>
+            <button class="quiz__elem" type="submit" name="price" value="0-1000">До 1 000 руб</button>
+            <input type="hidden" name="event" value="{{ event }}"/>
+            <input type="hidden" name="custom" value="{{ custom }}"/>
+          </form>
+          <form>
+            <button class="quiz__elem" type="submit" name="price" value="1000-5000">1 000 - 5 000 руб</button>
+            <input type="hidden" name="event" value="{{ event }}"/>
+            <input type="hidden" name="custom" value="{{ custom }}"/>
+          </form>
+          <form>
+            <button class="quiz__elem" type="submit" name="price" value="5000-999999999">от 5 000 руб</button>
+            <input type="hidden" name="event" value="{{ event }}"/>
+            <input type="hidden" name="custom" value="{{ custom }}"/>
+          </form>
+          <form>
+            <button class="quiz__elem" type="submit" name="price" value="0-999999999">Не имеет значения</button>
+            <input type="hidden" name="event" value="{{ event }}"/>
+            <input type="hidden" name="custom" value="{{ custom }}"/>
+          </form>
+        </div>
+        {% endif %}
         <div class="quiz__progress">
           <div class="quiz__progress_step">
             <span class="quiz__progress_num">2</span>
