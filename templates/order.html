@@ -8,11 +8,11 @@
 				<div class="order__block">
 					<div class="order_items">
 						<div class="title">Оформление доставки</div>
-						<form action="{% url 'order' id %}" method="post" class="order__form">
+						<form action="{% url 'order' bouquet.id %}" method="post" class="order__form">
 							{% csrf_token %}
 							<div class="order__form_block ficb">
-								{{form.name}}
-								<span>{{form.name.errors}}</span>
+								{{form.client_name}}
+								<span>{{form.client_name.errors}}</span>
 								{{form.phone}}
 								<span>{{form.phone.errors}}</span>
 								{{form.delivery_address}}
@@ -32,7 +32,7 @@
 							<div class="order__form_line"></div>
 							<div class="order__form_btns ficb">
 								<button class="btn order__form_pay">Оплатить</button>
-								<a href="{% url 'card' id %}" style="text-decoration: none; color: #ABABAB;">
+								<a href="{% url 'card' bouquet.id %}" style="text-decoration: none; color: #ABABAB;">
 									<button class="btn order__form_btn" type="button">Назад</button>
 								</a>
 							</div>
@@ -43,6 +43,8 @@
 		</div>
 		<img src="{% static 'img/orderImg.jpg' %}" alt="orderImg" class="order__img">
 	</section>
+
+
 {% endblock first-section %}
 {% block contacts %}{% endblock contacts %}
 {% block consultation %}{% endblock consultation %}

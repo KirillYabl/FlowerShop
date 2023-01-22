@@ -15,9 +15,11 @@ from .models import Consultation
 from .models import Event
 from .models import FlowerShop
 from .models import BouquetItemsInBouquet
+from .models import Order
+from .models import DeliveryWindow
 
 from django.db.models import Prefetch
-from environs import Env
+from flower_shop import settings
 
 
 def index(request: WSGIRequest) -> HttpResponse:
@@ -110,29 +112,40 @@ def consultation(request: WSGIRequest) -> HttpResponse:
 
 
 def order(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
-    env = Env()
-    env.read_env()
-    link_pay = env.str('LINK_PAY')
-
-    form = OrderForm()
+    link_pay = settings.LINK_PAY
     
     selected_bouquet = Bouquet.objects.get(id=bouquet_id)
     price_order = float(selected_bouquet.price)
     link_order = f'{link_pay}{price_order}'
+
+    form = OrderForm()
+
     context = {
         'link_order': link_order,
-        'id': bouquet_id,
+        'bouquet': selected_bouquet,
         'form': form,
     }
 
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
+            cleaned_inputs = form.cleaned_data
+            delivery_window = DeliveryWindow.objects.get(id=int(cleaned_inputs['delivery_window']))
+
+            new_order = Order.objects.create(
+                bouquet=selected_bouquet,
+                price=price_order,
+                client_name=cleaned_inputs['client_name'],
+                phone=cleaned_inputs['phone'],
+                delivery_address=cleaned_inputs['delivery_address'],
+                delivery_window=delivery_window,
+                paid=True
+            )
+            new_order.save()
+
             response = redirect(link_order)
             return response
-        else:
-            form = OrderForm()
+    
     return render(request, 'order.html', context)
 
 
