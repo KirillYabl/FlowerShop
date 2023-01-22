@@ -55,12 +55,11 @@ class BouquetItemsInBouquetInline(admin.TabularInline):
 
 @admin.register(m.Bouquet)
 class BouquetAdmin(admin.ModelAdmin):
-    inlines = [BouquetItemsInBouquetInline]
+    inlines = [BouquetItemsInBouquetInline, FlowerShopCatalogItemInline]
     list_display = ['get_image_list_preview', 'name', 'price', 'height_cm', 'width_cm']
     list_display_links = ['name', 'price', 'height_cm', 'width_cm']
     search_fields = ['name', 'description', 'price']
     list_filter = ['price', 'height_cm', 'width_cm', 'events']
-    inlines = [FlowerShopCatalogItemInline]
 
     readonly_fields = [
         'get_image_preview',
