@@ -94,6 +94,7 @@ def view_availability(request):
 def view_orders(request):
     orders = (
         Order.objects
+            .select_related('bouquet')
             .exclude(status__in=[Order.Status.delivered, Order.Status.cancelled])
             .order_by('-status', 'id')
     )
@@ -105,9 +106,11 @@ def serialize_order(order):
     return {
         'id': order.id,
         'status': order.status,
+        'bouquet_name': order.bouquet.name,
         'client_name': order.client_name,
         'phone': order.phone,
         'delivery_address': order.delivery_address,
+        'delivery_window': order.delivery_window,
         'comment': order.comment,
         'price': order.price,
     }
