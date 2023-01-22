@@ -875,6 +875,19 @@ color: #FFFFFF;
 	padding: 19px 28px;
 }
 
+.stats-table {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  border-color: #17CF97;
+}
+
+.stats-table-row {
+  padding-right: 15px;
+  padding-bottom: 8px;
+  padding-top: 8px;
+}
+
 /*availability.html*/
 .default-btn {
     padding: 10px;

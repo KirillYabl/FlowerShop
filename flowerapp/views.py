@@ -272,6 +272,16 @@ def stats(request: WSGIRequest) -> HttpResponse:
 
     if filter_params:
         consultations = consultations.filter(**filter_params)
+        orders_for_top = orders.filter(**filter_params)
+        top_clients = orders_for_top.values('phone').annotate(
+            order_sum=Sum('price'), order_cnt=Count('id')).order_by('-order_sum', '-order_cnt')[:5]
+        top_bouquets = orders_for_top.select_related('bouquet').values('bouquet__name').annotate(
+            orders_cnt=Count('id')).order_by('-orders_cnt')[:5]
+    else:
+        top_clients = orders.values('phone').annotate(order_sum=Sum('price'), order_cnt=Count('id')).order_by(
+            '-order_sum', '-order_cnt')[:5]
+        top_bouquets = orders.select_related('bouquet').filter(**filter_params).values('bouquet__name').annotate(
+            orders_cnt=Count('id')).order_by('-orders_cnt')[:5]
 
     if bouquet != 'any':
         try:
@@ -388,6 +398,8 @@ def stats(request: WSGIRequest) -> HttpResponse:
         'compose_to_delivery_avg_time': TimedeltaWrapper(orders_dt_aggregated['compose_to_delivery_avg_time']),
         'most_popular_window': most_popular_window,
         'by_hours_distribution': by_hours_distribution,
-        'by_time_distribution': by_time_distribution
+        'by_time_distribution': by_time_distribution,
+        'top_bouquets': top_bouquets,
+        'top_clients': top_clients
     }
     return render(request, 'stats.html', context)

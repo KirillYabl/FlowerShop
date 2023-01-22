@@ -88,6 +88,45 @@
           </div>
         </div>
       </div>
+      <br>
+      <div class="result__block ficb">
+        <div class="stats__items">
+          <div class="title result__items_title">Топ {{ top_bouquets.count }} букетов по количеству заказов</div>
+          <hr class="result__items_line"/>
+          <table class="table table-responsive stats-table" border=1 frame=void rules=rows>
+            <tr>
+              <th class="stats-table-row">Название</th>
+              <th class="stats-table-row">Количество заказов</th>
+            </tr>
+
+            {% for bouquet in top_bouquets %}
+            <tr>
+              <td class="stats-table-row">{{ bouquet.bouquet__name }}</td>
+              <td class="stats-table-row">{{ bouquet.orders_cnt|format_thousands }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+        <div class="stats__items">
+          <div class="title result__items_title">Топ {{ top_clients.count }} клиентов по сумме заказа</div>
+          <hr class="result__items_line"/>
+          <table class="table table-responsive stats-table" border=1 frame=void rules=rows>
+            <tr>
+              <th class="stats-table-row">Телефон</th>
+              <th class="stats-table-row">Сумма заказов</th>
+              <th class="stats-table-row">Количество заказов</th>
+            </tr>
+
+            {% for client in top_clients %}
+            <tr>
+              <td class="stats-table-row">{{ client.phone }}</td>
+              <td class="stats-table-row">{{ client.order_sum|format_thousands }}</td>
+              <td class="stats-table-row">{{ client.order_cnt|format_thousands }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -157,6 +196,12 @@
       }
     }
   });
+
+
+
+
+
+
 
 
 </script>
