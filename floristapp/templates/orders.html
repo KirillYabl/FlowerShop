@@ -5,12 +5,14 @@
   <div class="container">
    <table class="table table-responsive">
     <tr>
-      <th>ID заказа</th>
+      <th>ID</th>
       <th>Статус</th>
+      <th>Букет</th>
       <th>Стоимость</th>
       <th>Клиент</th>
       <th>Телефон</th>
-      <th>Адрес доставки</th>                
+      <th>Адрес доставки</th>
+      <th>Время доставки</th>
       <th>Комментарий</th>
       <th>Ссылка на админку</th>
     </tr>
@@ -19,10 +21,12 @@
       <tr>
         <td>{{ order.id }}</td>
         <td>{{ order.status }}</td>
+        <td>{{ order.bouquet_name }}</td>
         <td>{{ order.price }} руб.</td>
         <td>{{ order.client_name }}</td>
         <td>{{ order.phone }}</td>
         <td>{{ order.delivery_address }}</td>
+        <td>{{ order.delivery_window }}</td>
         <td>{{ order.comment }}</td>               
         <td><a href="{% url 'admin:flowerapp_order_change' order.id|urlencode %}?next={{ request.path|urlencode }}">Редактировать</a></td>
       </tr>
