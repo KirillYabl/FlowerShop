@@ -1,4 +1,5 @@
 import datetime
+from typing import Union
 from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
@@ -16,12 +17,42 @@ from .forms import ConsultationForm
 from .forms import CustomEventForm
 from .forms import OrderForm
 from .models import Bouquet
-from .models import BouquetItemsInBouquet
 from .models import Consultation
 from .models import DeliveryWindow
 from .models import Event
 from .models import FlowerShop
 from .models import Order
+
+
+def redirect_with_success_alert(view_name: str, **kwargs) -> HttpResponse:
+    """Set cookie success_alert_style and redirect to page with params in kwargs."""
+    response = redirect(view_name, **kwargs)
+    expires_seconds = 3
+    expires = timezone.now() + timezone.timedelta(seconds=expires_seconds)
+    response.set_cookie('success_alert_style', 'block', expires=expires)
+    return response
+
+
+class TimedeltaWrapper:
+    """Wrapper for datetime.timedelta which can return hours and minutes (reminded from hours).
+
+    If td is None return "---"
+    Wrapper needs for django template
+    """
+    def __init__(self, td: Union[datetime.timedelta, None]):
+        self.td = td
+
+    @property
+    def hours(self):
+        if self.td:
+            return self.td.seconds // 3600
+        return '---'
+
+    @property
+    def minutes60(self):
+        if self.td:
+            return (self.td.seconds // 60) % 60
+        return '---'
 
 
 def index(request: WSGIRequest) -> HttpResponse:
@@ -39,11 +70,7 @@ def index(request: WSGIRequest) -> HttpResponse:
         context['form'] = ConsultationForm(request.POST, class_name='consultation__form_input')
         if context['form'].is_valid():
             context['form'].save()
-            response = redirect('index')
-            expires_seconds = 3
-            expires = timezone.now() + timezone.timedelta(seconds=expires_seconds)
-            response.set_cookie('success_alert_style', 'block', expires=expires)
-            return response
+            return redirect_with_success_alert('index')
 
     return render(request, 'index.html', context)
 
@@ -62,11 +89,7 @@ def card(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
         context['form'] = ConsultationForm(request.POST, class_name='consultation__form_input')
         if context['form'].is_valid():
             context['form'].save()
-            response = redirect('card', bouquet_id=bouquet_id)
-            expires_seconds = 3
-            expires = timezone.now() + timezone.timedelta(seconds=expires_seconds)
-            response.set_cookie('success_alert_style', 'block', expires=expires)
-            return response
+            return redirect_with_success_alert('card', bouquet_id=bouquet_id)
     return render(request, 'card.html', context)
 
 
@@ -84,11 +107,7 @@ def catalog(request: WSGIRequest) -> HttpResponse:
         context['form'] = ConsultationForm(request.POST, class_name='consultation__form_input')
         if context['form'].is_valid():
             context['form'].save()
-            response = redirect('catalog')
-            expires_seconds = 3
-            expires = timezone.now() + timezone.timedelta(seconds=expires_seconds)
-            response.set_cookie('success_alert_style', 'block', expires=expires)
-            return response
+            return redirect_with_success_alert('catalog')
     return render(request, 'catalog.html', context)
 
 
@@ -99,11 +118,7 @@ def consultation(request: WSGIRequest) -> HttpResponse:
         context['form'] = ConsultationForm(request.POST, class_name='singUpConsultation__form_input')
         if context['form'].is_valid():
             context['form'].save()
-            response = redirect('index')
-            expires_seconds = 3
-            expires = timezone.now() + timezone.timedelta(seconds=expires_seconds)
-            response.set_cookie('success_alert_style', 'block', expires=expires)
-            return response
+            return redirect_with_success_alert('index')
     return render(request, 'consultation.html', context)
 
 
@@ -113,8 +128,6 @@ def order(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
     selected_bouquet = Bouquet.objects.get(id=bouquet_id)
     price_order = float(selected_bouquet.price)
     link_order = f'{link_pay}{price_order}'
-
-    # form = OrderForm()
 
     context = {
         'link_order': link_order,
@@ -180,11 +193,7 @@ def quiz(request: WSGIRequest) -> HttpResponse:
             budget=budget,
         )
         consultation_obj.save()
-        response = redirect('index')
-        expires_seconds = 3
-        expires = timezone.now() + timezone.timedelta(seconds=expires_seconds)
-        response.set_cookie('success_alert_style', 'block', expires=expires)
-        return response
+        return redirect_with_success_alert('index')
 
     return render(request, 'quiz.html', context)
 
@@ -194,18 +203,21 @@ def result(request: WSGIRequest) -> HttpResponse:
     price_from = request.GET.get('price_from', None)
     price_to = request.GET.get('price_to', None)
     params = {}
+
     if event:
         try:
             Event.objects.get(id=event)
             params['events__id__in'] = event
         except Event.DoesNotExist:
             pass
+
     if price_from:
         try:
             float(price_from)
             params['price__gte'] = price_from
         except ValueError:
             pass
+
     if price_to:
         try:
             float(price_to)
@@ -359,22 +371,6 @@ def stats(request: WSGIRequest) -> HttpResponse:
     else:
         by_time_distribution = list(orders.annotate(t=F('created_at__year')).values('t').annotate(
             num=Count('t')).order_by('t'))
-
-    class TimedeltaWrapper:
-        def __init__(self, td: datetime.timedelta):
-            self.td = td
-
-        @property
-        def hours(self):
-            if self.td:
-                return self.td.seconds // 3600
-            return '---'
-
-        @property
-        def minutes60(self):
-            if self.td:
-                return (self.td.seconds // 60) % 60
-            return '---'
 
     context = {
         'bouquets': Bouquet.objects.all(),
