@@ -14,7 +14,7 @@
 					<div class="card__elems ">
 						<span class="card__elems_intro">Состав</span>
 						<div class="card__items">
-							{% for bouquet_item in bouquet_items %}
+							{% for bouquet_item in bouquet.items.all %}
 							<span class="card_items_intro">
 								{{ bouquet_item.item }} - {{ bouquet_item.count }} шт.
 							</span>
@@ -35,9 +35,6 @@
 					<a href="{% url 'order' bouquet.id %}">
 						<button class="btn largeBtn card__btn">Заказать букет</button>
 					</a>
-					<!-- <a href="{{link_order}}" class="btn largeBtn card__btn" style="display: block; text-decoration: none; text-align: center;">
-						Заказать букет
-					</a> -->
 				</div>
 			</div>
 		</div>

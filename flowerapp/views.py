@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.handlers.wsgi import WSGIRequest
 from django.conf import settings
 from django.db import models
-from django.db.models import Prefetch, Sum, Count, F, Case, When, Value, Avg, Min
+from django.db.models import Sum, Count, F, Case, When, Value, Avg, Min
 from django.db.models.functions import Concat
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -22,7 +22,6 @@ from .models import DeliveryWindow
 from .models import Event
 from .models import FlowerShop
 from .models import Order
-
 
 
 def index(request: WSGIRequest) -> HttpResponse:
@@ -51,19 +50,11 @@ def index(request: WSGIRequest) -> HttpResponse:
 
 def card(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
     success_alert_style = request.COOKIES.get('success_alert_style', 'none')
-    bouquets = Bouquet.objects.prefetch_related(
-        Prefetch(
-            "items",
-            queryset=BouquetItemsInBouquet.objects.filter(bouquet=bouquet_id),
-            to_attr="curent_items",
-        )
-    )
+    bouquets = Bouquet.objects.prefetch_related('items', 'items__item')
     selected_bouquet = bouquets.get(id=bouquet_id)
 
-    bouquet_items = selected_bouquet.curent_items
     context = {
         'bouquet': selected_bouquet,
-        'bouquet_items': bouquet_items,
         'success_alert_style': success_alert_style,
         'form': ConsultationForm(class_name='consultation__form_input'),
     }
@@ -118,7 +109,7 @@ def consultation(request: WSGIRequest) -> HttpResponse:
 
 def order(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
     link_pay = settings.LINK_PAY
-    
+
     selected_bouquet = Bouquet.objects.get(id=bouquet_id)
     price_order = float(selected_bouquet.price)
     link_order = f'{link_pay}{price_order}'
@@ -150,7 +141,7 @@ def order(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
 
             response = redirect(link_order)
             return response
-    
+
     return render(request, 'order.html', context)
 
 
