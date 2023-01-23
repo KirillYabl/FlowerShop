@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import authenticate, login, views as auth_views
 from django.contrib.auth.decorators import user_passes_test
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 
@@ -95,10 +95,13 @@ def view_orders(request):
     orders = (
         Order.objects
             .select_related('bouquet')
-            .exclude(status__in=[Order.Status.delivered, Order.Status.cancelled])
-            .order_by('-status', 'id')
+            .filter(status__in=[Order.Status.created, Order.Status.composing, Order.Status.composed])
+        )
+    sorted_orders = sorted(
+        orders,
+        key=lambda x: ([Order.Status.created, Order.Status.composing, Order.Status.composed].index(x.status), x.id)
     )
-    context = {'orders': [serialize_order(order) for order in orders]} 
+    context = {'orders': [serialize_order(order) for order in sorted_orders]} 
     return render(request, template_name='orders.html', context=context)
 
 
@@ -114,3 +117,15 @@ def serialize_order(order):
         'comment': order.comment,
         'price': order.price,
     }
+
+
+def change_status(request, order_id):
+    order = get_object_or_404(Order, pk=order_id)
+
+    if order.status == Order.Status.created:
+        order.status = Order.Status.composing
+    elif order.status == Order.Status.composing:
+        order.status = Order.Status.composed
+    order.save(update_fields=['status'])
+
+    return view_orders(request)
