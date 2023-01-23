@@ -3,7 +3,6 @@ from phonenumber_field.formfields import PhoneNumberField
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
 from .models import Consultation
-from .models import Order
 from .models import DeliveryWindow
 
 

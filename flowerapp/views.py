@@ -3,7 +3,9 @@ from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
 from django.core.handlers.wsgi import WSGIRequest
+from django.conf import settings
 from django.db import models
+from django.db.models import Prefetch, Sum, Count, F, Case, When, Value, Avg, Min
 from django.db.models.functions import Concat
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -20,11 +22,7 @@ from .models import DeliveryWindow
 from .models import Event
 from .models import FlowerShop
 from .models import Order
-from .models import Order
-from .models import DeliveryWindow
 
-from django.db.models import Prefetch, Sum, Count, F, Case, When, Value, Avg, Min, ExpressionWrapper
-from flower_shop import settings
 
 
 def index(request: WSGIRequest) -> HttpResponse:
