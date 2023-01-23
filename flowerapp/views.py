@@ -39,6 +39,7 @@ class TimedeltaWrapper:
     If td is None return "---"
     Wrapper needs for django template
     """
+
     def __init__(self, td: Union[datetime.timedelta, None]):
         self.td = td
 
@@ -211,30 +212,20 @@ def result(request: WSGIRequest) -> HttpResponse:
         except Event.DoesNotExist:
             pass
 
-    if price_from:
-        try:
-            float(price_from)
-            params['price__gte'] = price_from
-        except ValueError:
-            pass
+    for price, price_lookup in {price_from: 'gte', price_to: 'lte'}.items():
+        if price:
+            try:
+                float(price)
+                params[f'price__{price_lookup}'] = price
+            except ValueError:
+                pass
 
-    if price_to:
-        try:
-            float(price_to)
-            params['price__lte'] = price_to
-        except ValueError:
-            pass
+    # TODO: move recommendation algorithm in model QuerySet
+    recommended_bouquets = Bouquet.objects.filter(**params).order_by('-price').prefetch_related('items', 'items__item')
+    all_bouquets = Bouquet.objects.all().order_by('-price').prefetch_related('items', 'items__item')
 
-    if params:
-        suitable_bouquets = Bouquet.objects.filter(**params)
-        if suitable_bouquets:
-            selected_bouquet = suitable_bouquets.order_by('-price').prefetch_related('items', 'items__item')[0]
-        else:
-            # else for avoid extra queries
-            selected_bouquet = Bouquet.objects.order_by('-price').prefetch_related('items', 'items__item')[0]
-    else:
-        # else for avoid extra queries
-        selected_bouquet = Bouquet.objects.order_by('-price').prefetch_related('items', 'items__item')[0]
+    # economy 1 query because of lazy QuerySet and lazy python logic if recommended_bouquets exists
+    selected_bouquet = recommended_bouquets.first() or all_bouquets.first()
 
     context = {'bouquet': selected_bouquet}
     return render(request, 'result.html', context)
