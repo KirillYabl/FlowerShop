@@ -137,7 +137,9 @@ class DeliveryWindow(models.Model):
 class Order(models.Model):
     class Status(models.TextChoices):
         created = 'создан'
+        composing = 'собирается'
         composed = 'собран'
+        delivering = 'доставляется'
         delivered = 'доставлен'
         cancelled = 'отменен'
 

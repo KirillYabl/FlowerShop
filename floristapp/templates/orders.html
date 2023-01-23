@@ -14,7 +14,7 @@
       <th>Адрес доставки</th>
       <th>Время доставки</th>
       <th>Комментарий</th>
-      <th>Ссылка на админку</th>
+      <th>Действие</th>
     </tr>
 
     {% for order in orders %}
@@ -28,7 +28,20 @@
         <td>{{ order.delivery_address }}</td>
         <td>{{ order.delivery_window }}</td>
         <td>{{ order.comment }}</td>               
-        <td><a href="{% url 'admin:flowerapp_order_change' order.id|urlencode %}?next={{ request.path|urlencode }}">Редактировать</a></td>
+        <td>
+          {% if order.status == 'создан' or order.status == 'собирается' %}
+            <form method="post" action="./{{ order.id }}">
+            {% csrf_token %}
+            {% if order.status == 'создан' %}
+              <input type="submit" class="btn default-btn" value="Взять в работу">
+            {% else %}
+              <input type="submit" class="btn default-btn" value="Передать на доставку">
+            {% endif %}
+          </form>
+          {% else %}
+            Передан на доставку
+          {% endif %}
+        </td>
       </tr>
     {% endfor %}
    </table>
