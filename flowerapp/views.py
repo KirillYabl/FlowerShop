@@ -203,31 +203,8 @@ def result(request: WSGIRequest) -> HttpResponse:
     event = request.GET.get('event', None)
     price_from = request.GET.get('price_from', None)
     price_to = request.GET.get('price_to', None)
-    params = {}
 
-    if event:
-        try:
-            Event.objects.get(id=event)
-            params['events__id__in'] = event
-        except Event.DoesNotExist:
-            pass
-
-    for price, price_lookup in {price_from: 'gte', price_to: 'lte'}.items():
-        if price:
-            try:
-                float(price)
-                params[f'price__{price_lookup}'] = price
-            except ValueError:
-                pass
-
-    # TODO: move recommendation algorithm in model QuerySet
-    recommended_bouquets = Bouquet.objects.filter(**params).order_by('-price').prefetch_related('items', 'items__item')
-    all_bouquets = Bouquet.objects.all().order_by('-price').prefetch_related('items', 'items__item')
-
-    # economy 1 query because of lazy QuerySet and lazy python logic if recommended_bouquets exists
-    selected_bouquet = recommended_bouquets.first() or all_bouquets.first()
-
-    context = {'bouquet': selected_bouquet}
+    context = {'bouquet': Bouquet.objects.get_recommended_bouquet(event, price_from, price_to)}
     return render(request, 'result.html', context)
 
 

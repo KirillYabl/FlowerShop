@@ -23,6 +23,38 @@ class Event(models.Model):
         return self.name
 
 
+class BouquetQuerySet(models.QuerySet):
+    def get_recommended_bouquet(self, event: str, price_from: str, price_to: str) -> 'Bouquet':
+        """
+        Get bouquet by recommendation algorithm
+
+        Algorithm: filter by event and price range and return most expensive bouquet after filter
+        If no bouquets after filter return just most expensive bouquet
+        """
+        params = {}
+        if event:
+            try:
+                Event.objects.get(id=event)
+                params['events__id__in'] = event
+            except Event.DoesNotExist:
+                pass
+
+        for price, price_lookup in {price_from: 'gte', price_to: 'lte'}.items():
+            if price:
+                try:
+                    float(price)
+                    params[f'price__{price_lookup}'] = price
+                except ValueError:
+                    pass
+
+        recommended_bouquets = self.filter(**params).order_by(
+            '-price').prefetch_related('items', 'items__item')
+        all_bouquets = self.order_by('-price').prefetch_related('items', 'items__item')
+
+        # economy 1 query because of lazy QuerySet and lazy python logic if recommended_bouquets exists
+        return recommended_bouquets.first() or all_bouquets.first()
+
+
 class Bouquet(models.Model):
     name = models.CharField('название', max_length=100, unique=True)
     description = models.TextField('описание')
@@ -40,6 +72,8 @@ class Bouquet(models.Model):
     )
     events = models.ManyToManyField(Event)
     is_recommended = models.BooleanField('рекомендованный', default=False)
+
+    objects = BouquetQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'букет'
