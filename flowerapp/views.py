@@ -9,7 +9,7 @@ from django.db import models
 from django.db.models import Sum, Count, F, Case, When, Value, Avg, Min
 from django.db.models.functions import Concat
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 
@@ -57,14 +57,10 @@ class TimedeltaWrapper:
 
 
 def index(request: WSGIRequest) -> HttpResponse:
-    success_alert_style = request.COOKIES.get('success_alert_style', 'none')
-
-    bouquets = Bouquet.objects.filter(is_recommended=True)
-    flower_shops = FlowerShop.objects.all()
     context = {
-        'bouquets': bouquets,
-        'flower_shops': flower_shops,
-        'success_alert_style': success_alert_style,
+        'bouquets': Bouquet.objects.filter(is_recommended=True),
+        'flower_shops': FlowerShop.objects.all(),
+        'success_alert_style': request.COOKIES.get('success_alert_style', 'none'),
         'form': ConsultationForm(class_name='consultation__form_input')
     }
     if request.method == 'POST':
@@ -77,13 +73,11 @@ def index(request: WSGIRequest) -> HttpResponse:
 
 
 def card(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
-    success_alert_style = request.COOKIES.get('success_alert_style', 'none')
     bouquets = Bouquet.objects.prefetch_related('items', 'items__item')
-    selected_bouquet = bouquets.get(id=bouquet_id)
 
     context = {
-        'bouquet': selected_bouquet,
-        'success_alert_style': success_alert_style,
+        'bouquet': get_object_or_404(bouquets, id=bouquet_id),
+        'success_alert_style': request.COOKIES.get('success_alert_style', 'none'),
         'form': ConsultationForm(class_name='consultation__form_input'),
     }
     if request.method == 'POST':
@@ -95,15 +89,15 @@ def card(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
 
 
 def catalog(request: WSGIRequest) -> HttpResponse:
-    success_alert_style = request.COOKIES.get('success_alert_style', 'none')
     bouquets = Bouquet.objects.all()
-    count_items = len(bouquets)
+
     context = {
         'bouquets': bouquets,
-        'count_items': count_items,
-        'success_alert_style': success_alert_style,
+        'count_items': len(bouquets),
+        'success_alert_style': request.COOKIES.get('success_alert_style', 'none'),
         'form': ConsultationForm(class_name='consultation__form_input'),
     }
+
     if request.method == 'POST':
         context['form'] = ConsultationForm(request.POST, class_name='consultation__form_input')
         if context['form'].is_valid():
@@ -124,11 +118,9 @@ def consultation(request: WSGIRequest) -> HttpResponse:
 
 
 def order(request: WSGIRequest, bouquet_id: int) -> HttpResponse:
-    link_pay = settings.LINK_PAY
-
-    selected_bouquet = Bouquet.objects.get(id=bouquet_id)
+    selected_bouquet = get_object_or_404(Bouquet, id=bouquet_id)
     price_order = float(selected_bouquet.price)
-    link_order = f'{link_pay}{price_order}'
+    link_order = f'{settings.LINK_PAY}{price_order}'
 
     context = {
         'link_order': link_order,
@@ -171,11 +163,11 @@ def quiz(request: WSGIRequest) -> HttpResponse:
         context['form'] = CustomEventForm()
         context['anchor'] = '#consultation'
 
-    if event and price:
+    if event and price:  # this means that user pass 2 steps
         price_from = price.split('-')[0]
         price_to = price.split('-')[-1]
 
-        if not custom:
+        if not custom:  # no form too
             query_string = urlencode({'event': event, 'price_from': price_from, 'price_to': price_to})
             return redirect(reverse('result') + '?' + query_string)
 
@@ -186,6 +178,7 @@ def quiz(request: WSGIRequest) -> HttpResponse:
                 context[name] = str(value)
         else:
             return render(request, 'quiz.html', context)
+
         budget = f'От {price_from} до {price_to}'
         consultation_obj = Consultation(
             client_name=context['client_name'],
