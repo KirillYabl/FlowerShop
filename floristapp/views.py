@@ -1,67 +1,7 @@
-from django import forms
-from django.contrib.auth import authenticate, login, views as auth_views
 from django.contrib.auth.decorators import user_passes_test
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
-from django.views import View
+from django.shortcuts import get_object_or_404, render
 
 from flowerapp.models import Bouquet, FlowerShop, Order
-
-
-class Login(forms.Form):
-    username = forms.CharField(
-        label='Логин',
-        max_length=75,
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'form-control',
-                'placeholder': 'Укажите имя пользователя'
-            }
-        )
-    )
-    password = forms.CharField(
-        label='Пароль',
-        max_length=75,
-        required=True,
-        widget=forms.PasswordInput(
-            attrs={
-                'class': 'form-control',
-                'placeholder': 'Введите пароль'
-            }
-        )
-    )
-
-
-class LoginView(View):
-    def get(self, request, *args, **kwargs):
-        form = Login()
-        return render(
-            request,
-            'florist_login.html',
-            context={'form': form}
-        )
-
-    def post(self, request):
-        form = Login(request.POST)
-
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-
-            user = authenticate(request, username=username, password=password)
-            if user:
-                login(request, user)
-                if user.is_staff:  # FIXME replace with specific permission
-                    return redirect('floristapp:orders')
-                return redirect('start_page')
-
-        context={'form': form, 'ivalid': True}
-        return render(request,'florist_login.html', context=context)
-
-
-class LogoutView(auth_views.LogoutView):
-    next_page = reverse_lazy('floristapp:login')
 
 
 def is_florist(user):
@@ -72,7 +12,7 @@ def is_florist(user):
 def view_availability(request):
     flower_shops = FlowerShop.objects.order_by('address')
     shops_addresses = [
-        flower_shop.address[11:].strip() if flower_shop.address.startswith('Красноярск,') else flower_shop.address 
+        flower_shop.address[11:].strip() if flower_shop.address.startswith('Красноярск,') else flower_shop.address
         for flower_shop in flower_shops
     ]
 
@@ -83,7 +23,7 @@ def view_availability(request):
         ordered_availability = [availability.get(flower_shop.id, False) for flower_shop in flower_shops]
         bouquets_availability.append((bouquet, ordered_availability))
 
-    context={
+    context = {
         'bouquets_availability': bouquets_availability,
         'shops_addresses': shops_addresses,
     }
@@ -94,14 +34,14 @@ def view_availability(request):
 def view_orders(request):
     orders = (
         Order.objects
-            .select_related('bouquet')
-            .filter(status__in=[Order.Status.created, Order.Status.composing, Order.Status.composed])
-        )
+        .select_related('bouquet')
+        .filter(status__in=[Order.Status.created, Order.Status.composing, Order.Status.composed])
+    )
     sorted_orders = sorted(
         orders,
         key=lambda x: ([Order.Status.created, Order.Status.composing, Order.Status.composed].index(x.status), x.id)
     )
-    context = {'orders': [serialize_order(order) for order in sorted_orders]} 
+    context = {'orders': [serialize_order(order) for order in sorted_orders]}
     return render(request, template_name='orders.html', context=context)
 
 
