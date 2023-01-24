@@ -10,15 +10,9 @@
         <div>
           <form action="" class="consultation__form">
             <select style="margin-right: 7px" name="period" class="quiz__form_input" id="period">
-              <option value="all">За все время</option>
-              <option value="today">Сегодня</option>
-              <option value="week">За неделю</option>
-              <option value="month">За месяц</option>
-              <option value="year">За год</option>
-              <option value="this_month">Этот месяц</option>
-              <option value="this_year">Этот год</option>
-              <option value="previous_month">Прошлый месяц</option>
-              <option value="previous_year">Прошлый год</option>
+              {% for period_choice in period_choices %}
+              <option value="{{ period_choice.name }}">{{ period_choice.value }}</option>
+              {% endfor %}
             </select>
             <select style="margin-right: 7px" name="bouquet" class="quiz__form_input" id="bouquet">
               <option value="any">Любой</option>
@@ -196,6 +190,7 @@
       }
     }
   });
+
 
 
 

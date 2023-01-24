@@ -237,43 +237,17 @@ def stats(request: WSGIRequest) -> HttpResponse:
     bouquet = request.GET.get('bouquet', 'any')
     orders = Order.objects.exclude(status=Order.Status.cancelled)
     consultations = Consultation.objects.all()
+    top_n = 5
 
     filter_params = {}
 
-    if period != 'all':
-        if period == 'today':
-            filter_params['created_at__date'] = timezone.now().date()
-        elif period == 'week':
-            filter_params['created_at__date__gt'] = timezone.now().date() - timezone.timedelta(days=7)
-        elif period == 'month':
-            filter_params['created_at__date__gt'] = timezone.now().date() - timezone.timedelta(days=31)
-        elif period == 'year':
-            filter_params['created_at__date__gt'] = timezone.now().date() - timezone.timedelta(days=365)
-        elif period == 'this_month':
-            filter_params['created_at__month'] = timezone.now().date().month
-            filter_params['created_at__year'] = timezone.now().date().year
-        elif period == 'this_year':
-            filter_params['created_at__year'] = timezone.now().date().year
-        elif period == 'previous_month':
-            filter_params[
-                'created_at__month'] = timezone.now().date().month - 1 if timezone.now().date().month != 1 else 12
-            filter_params['created_at__year'] = timezone.now().date().year if filter_params[
-                                                                                  'created_at__month'] != 12 else timezone.now().date().year - 1
-        elif period == 'previous_year':
-            filter_params['created_at__year'] = timezone.now().date().year - 1
+    if period in Order.DashboardFilterPeriod.names:
+        filter_params.update(**Order.dashboard_period_filters[period])
 
-    if filter_params:
-        consultations = consultations.filter(**filter_params)
-        orders_for_top = orders.filter(**filter_params)
-        top_clients = orders_for_top.values('phone').annotate(
-            order_sum=Sum('price'), order_cnt=Count('id')).order_by('-order_sum', '-order_cnt')[:5]
-        top_bouquets = orders_for_top.select_related('bouquet').values('bouquet__name').annotate(
-            orders_cnt=Count('id')).order_by('-orders_cnt')[:5]
-    else:
-        top_clients = orders.values('phone').annotate(order_sum=Sum('price'), order_cnt=Count('id')).order_by(
-            '-order_sum', '-order_cnt')[:5]
-        top_bouquets = orders.select_related('bouquet').filter(**filter_params).values('bouquet__name').annotate(
-            orders_cnt=Count('id')).order_by('-orders_cnt')[:5]
+    # these stats should compute without bouquet filter
+    consultations = consultations.filter(**filter_params)
+    top_clients = orders.filter(**filter_params).get_top_n_clients(top_n)
+    top_bouquets = orders.filter(**filter_params).get_top_n_bouquets(top_n)
 
     if bouquet != 'any':
         try:
@@ -283,87 +257,27 @@ def stats(request: WSGIRequest) -> HttpResponse:
         except (ValueError, Bouquet.DoesNotExist):
             pass
 
-    if filter_params:
-        orders = orders.filter(**filter_params)
+    orders = orders.filter(**filter_params)
 
     try:
-        delivery_window_id = orders.values('delivery_window').annotate(
-            num=Count('delivery_window')).order_by('-num')[0]['delivery_window']
-        most_popular_window = DeliveryWindow.objects.get(id=delivery_window_id).name
+        most_popular_window = orders.select_related('delivery_window').values('delivery_window__name').annotate(
+            num=Count('delivery_window__name')
+        ).order_by('-num')[0]['delivery_window__name']
     except IndexError:
         most_popular_window = 'Не определено'
 
-    orders_dt_aggregated = orders.annotate(
-        delivered_date=F('delivered_at__date'),
-        composed_date=F('composed_at__date'),
-        created_date=F('created_at__date'),
-        delivered_time=F('delivered_at__time'),
-        composed_time=F('composed_at__time'),
-    ).annotate(
-        order_to_delivery_time=Case(
-            When(delivered_date=F('created_date'), then=F('delivered_at') - F('created_at')),
-            When(delivered_date__gt=F('created_date'),
-                 then=F('delivered_time') - datetime.time(8, 0, tzinfo=timezone.get_current_timezone())),
-        ),
-        order_to_compose_time=Case(
-            When(composed_date=F('created_date'), then=F('composed_at') - F('created_at')),
-            When(composed_date__gt=F('created_date'),
-                 then=F('composed_time') - datetime.time(8, 0, tzinfo=timezone.get_current_timezone())),
-        ),
-        compose_to_delivery_time=Case(
-            When(delivered_date=F('composed_date'), then=F('delivered_at') - F('composed_at')),
-            When(delivered_date__gt=F('composed_date'),
-                 then=F('delivered_time') - datetime.time(8, 0, tzinfo=timezone.get_current_timezone())),
-        ),
-    ).aggregate(
-        order_to_delivery_avg_time=Avg('order_to_delivery_time'),
-        order_to_compose_avg_time=Avg('order_to_compose_time'),
-        compose_to_delivery_avg_time=Avg('compose_to_delivery_time'),
-    )
+    orders_dt_aggregated = orders.get_order_points_avg()
+    by_hours_distribution = orders.get_by_hours_distribution()
+    by_time_distribution = orders.get_by_time_distribution(period)
 
-    by_hours_distribution = list(orders.annotate(hour=F('created_at__hour')).values('hour').annotate(
-        num=Count('hour')).order_by('hour'))
-    all_count = sum([item['num'] for item in by_hours_distribution])
-    by_hours_distribution = [
-        {
-            'hour': item['hour'],
-            'percent': str(round((item['num'] / all_count) * 100, 1)).replace(',', '.')
-        }
-        for item
-        in by_hours_distribution
+    period_choices = [
+        {'name': name, 'value': value}
+        for name, value
+        in zip(Order.DashboardFilterPeriod.names, Order.DashboardFilterPeriod.values)
     ]
 
-    first_order = orders.aggregate(dt=Min('created_at'))['dt']
-    if period == 'today':
-        by_time_distribution = list(orders.annotate(t=F('created_at__hour')).values('t').annotate(
-            num=Count('t')).order_by('t'))
-    elif period in ('week', 'month', 'this_month', 'previous_month') or (timezone.now() - first_order).days < 120:
-        by_time_distribution = list(orders.annotate(t=F('created_at__date')).values('t').annotate(
-            num=Count('t')).order_by('t'))
-    elif period in ('year', 'this_year', 'previous_year') or (timezone.now() - first_order).days < 365 * 2:
-        by_time_distribution = list(orders.annotate(
-            t=Case(
-                When(
-                    created_at__month__in=[10, 11, 12],
-                    then=Concat(
-                        F('created_at__year'), Value('.'), F('created_at__month'),
-                        output_field=models.CharField()
-                    )
-                ),
-                When(
-                    created_at__month__in=[i for i in range(1, 10)],
-                    then=Concat(
-                        F('created_at__year'), Value('.0'), F('created_at__month'),
-                        output_field=models.CharField()
-                    )
-                )
-            )
-        ).values('t').annotate(num=Count('t')).order_by('t'))
-    else:
-        by_time_distribution = list(orders.annotate(t=F('created_at__year')).values('t').annotate(
-            num=Count('t')).order_by('t'))
-
     context = {
+        'period_choices': period_choices,
         'bouquets': Bouquet.objects.all(),
         'orders_sum': orders.aggregate(orders_sum=Sum('price'))['orders_sum'],
         'orders_count': orders.count(),
