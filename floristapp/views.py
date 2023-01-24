@@ -4,17 +4,14 @@ from django.shortcuts import get_object_or_404, render
 from flowerapp.models import Bouquet, FlowerShop, Order
 
 
-def is_florist(user):
-    return user.is_staff  # FIXME replace with specific permission
+def is_staff(user):
+    return user.is_staff or user.is_florist or user.is_courier
 
 
-@user_passes_test(is_florist, login_url='login')
+@user_passes_test(is_staff, login_url='login')
 def view_availability(request):
     flower_shops = FlowerShop.objects.order_by('address')
-    shops_addresses = [
-        flower_shop.address[11:].strip() if flower_shop.address.startswith('Красноярск,') else flower_shop.address
-        for flower_shop in flower_shops
-    ]
+    shops_addresses = [flower_shop.address for flower_shop in flower_shops]
 
     bouquets = list(Bouquet.objects.prefetch_related('catalog_items').order_by('name'))
     bouquets_availability = []
@@ -30,33 +27,21 @@ def view_availability(request):
     return render(request, template_name='bouquets-availability.html', context=context)
 
 
-@user_passes_test(is_florist, login_url='login')
+@user_passes_test(is_staff, login_url='login')
 def view_orders(request):
+    # statuses ordered by flow
+    order_statuses = [Order.Status.created, Order.Status.composing, Order.Status.composed]
     orders = (
         Order.objects
         .select_related('bouquet')
-        .filter(status__in=[Order.Status.created, Order.Status.composing, Order.Status.composed])
+        .filter(status__in=order_statuses)
     )
     sorted_orders = sorted(
         orders,
-        key=lambda x: ([Order.Status.created, Order.Status.composing, Order.Status.composed].index(x.status), x.id)
+        key=lambda x: (order_statuses.index(x.status), x.created_at)
     )
-    context = {'orders': [serialize_order(order) for order in sorted_orders]}
+    context = {'orders': sorted_orders}
     return render(request, template_name='orders.html', context=context)
-
-
-def serialize_order(order):
-    return {
-        'id': order.id,
-        'status': order.status,
-        'bouquet_name': order.bouquet.name,
-        'client_name': order.client_name,
-        'phone': order.phone,
-        'delivery_address': order.delivery_address,
-        'delivery_window': order.delivery_window,
-        'comment': order.comment,
-        'price': order.price,
-    }
 
 
 def change_status(request, order_id):

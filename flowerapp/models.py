@@ -362,6 +362,12 @@ class Order(models.Model):
 
     objects = OrderQuerySet.as_manager()
 
+    def is_for_florist_statuses(self):
+        return self.status in [self.Status.created, self.Status.composing]
+
+    def is_for_courier_statuses(self):
+        return self.status in [self.Status.composed, self.Status.delivering]
+
     class Meta:
         verbose_name = 'заказ'
         verbose_name_plural = 'заказы'
